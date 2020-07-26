@@ -33,7 +33,7 @@ class _StartupScreenState extends State<StartupScreen> {
                 'Контроль\nкачества',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: Colors.blue,
+                    color: Theme.of(context).primaryColor,
                     fontSize: 40.0,
                     fontFamily: 'Roboto',
                     fontWeight: FontWeight.bold,
@@ -52,7 +52,8 @@ class _StartupScreenState extends State<StartupScreen> {
                 alignment: Alignment(0.0, 0.3),
                 child: CircularProgressIndicator(
                   strokeWidth: 2.0,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor),
                 ));
           },
         ),

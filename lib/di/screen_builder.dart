@@ -3,10 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/login_bloc.dart';
+import 'package:quality_control/bloc/request_bloc.dart';
 import 'package:quality_control/bloc/startup_bloc.dart';
 
 typedef StartupScreenBuilder = BlocProvider<StartupBloc> Function();
 typedef LoginScreenBuilder = BlocProvider<LoginBloc> Function();
+typedef RequestScreenBuilder = BlocProvider<RequestBloc> Function();
 
 class ScreenBuilder {
   ScreenBuilder({@required Injector injector}) : _injector = injector;
@@ -15,4 +17,7 @@ class ScreenBuilder {
 
   Widget Function() getLoginScreenBuilder() =>
       _injector.get<LoginScreenBuilder>();
+
+  Widget Function() getRequestScreenBuilder() =>
+      _injector.get<RequestScreenBuilder>();
 }

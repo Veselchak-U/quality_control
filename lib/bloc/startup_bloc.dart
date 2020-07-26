@@ -21,7 +21,7 @@ class StartupBloc extends BlocBase {
   }
 
   void gotoNextScreen() {
-    Widget Function() nextScreen = _screenBuilder.getLoginScreenBuilder();
+    Widget Function() nextScreen = _screenBuilder.getRequestScreenBuilder();
     Navigator.pushReplacement<Widget, Widget>(
         context,
         MaterialPageRoute<Widget>(
