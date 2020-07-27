@@ -1,8 +1,8 @@
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
-import 'package:quality_control/bloc/common/base_bloc.dart';
+import 'package:quality_control/bloc/common/i_bloc.dart';
 
-class LoginBloc extends BlocBase {
+class LoginBloc extends IBloc {
   LoginBloc() {
     _log.i('create');
   }

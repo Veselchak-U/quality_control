@@ -14,9 +14,11 @@ class StreamService {
   // Заявки
   final BehaviorSubject<List<Request>> listRequests =
       BehaviorSubject<List<Request>>();
+
   // Элементы списка: интервалы заявок
-  final BehaviorSubject<List<RequestIntervalItem>> listRequestIntervalItem =
+  final BehaviorSubject<List<RequestIntervalItem>> listRequestIntervalItems =
       BehaviorSubject<List<RequestIntervalItem>>();
+
   // Элементы списка: события по заявке
   final BehaviorSubject<List<Event>> listEvents =
       BehaviorSubject<List<Event>>();
@@ -41,7 +43,7 @@ class StreamService {
       });
     });
 
-    listRequestIntervalItem.add(result);
-    _log.d('_convertRequestToRequestIntervalItem add ${result.length} items');
+    listRequestIntervalItems.add(result);
+    _log.d('listRequestIntervalItem.add ${result.length} items');
   }
 }

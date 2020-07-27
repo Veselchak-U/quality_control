@@ -27,4 +27,5 @@ class Event {
   String comment; // комментарий к событию
 }
 
+// Тип события: создание, корректировка, установка статуса, выставление оценки
 enum EventType { CREATE, UPDATE, SET_STATUS, SET_RATING }

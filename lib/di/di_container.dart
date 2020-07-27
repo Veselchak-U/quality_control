@@ -4,9 +4,11 @@ import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/login_bloc.dart';
 import 'package:quality_control/bloc/request_bloc.dart';
 import 'package:quality_control/bloc/startup_bloc.dart';
-import 'package:quality_control/data/base_data_source.dart';
+import 'package:quality_control/data/i_data_source.dart';
+import 'package:quality_control/data/dummy_data_source.dart';
 import 'package:quality_control/data/repository.dart';
 import 'package:quality_control/di/screen_builder.dart';
+import 'package:quality_control/service/current_user_service.dart';
 import 'package:quality_control/service/stream_service.dart';
 import 'package:quality_control/ui/login_screen.dart';
 import 'package:quality_control/ui/request_screen.dart';
@@ -26,26 +28,23 @@ class DiContainer {
   }
 
   static void _registerServices() {
+    _injector.map<IDataSource>(
+        (i) => DummyDataSource(streamService: i.get<StreamService>()),
+        isSingleton: true);
+
     _injector.map<ScreenBuilder>((i) => ScreenBuilder(injector: i),
         isSingleton: true);
 
     _injector.map<StreamService>((i) => StreamService(), isSingleton: true);
 
-        _injector.map<Repository>(
-            (i) => Repository(
-            dataSource: i.get<BaseDataSource>(),
+    _injector.map<Repository>(
+        (i) => Repository(
+            dataSource: i.get<IDataSource>(),
             streamService: i.get<StreamService>()),
         isSingleton: true);
 
-    _injector.map<BaseDataSource>(
-            (i) => DummyDataSource(streamService: i.get<StreamService>()),
+    _injector.map<CurrentUserService>((i) => CurrentUserService(),
         isSingleton: true);
-
-//    _injector.map<CurrentUserService>(
-//            (i) => CurrentUserService(dataSource: i.get<IDataSource>()),
-//        isSingleton: true);
-//
-//
   }
 
   static void _registerScreenBuilders() {
@@ -53,7 +52,10 @@ class DiContainer {
     _injector.map<StartupScreenBuilder>(
         (i) => () => BlocProvider<StartupBloc>(
             child: StartupScreen(),
-            bloc: StartupBloc(screenBuilder: i.get<ScreenBuilder>())),
+            bloc: StartupBloc(
+                currentUserService: i.get<CurrentUserService>(),
+                repository: i.get<Repository>(),
+                screenBuilder: i.get<ScreenBuilder>())),
         isSingleton: true);
 
     // Login screen
@@ -68,7 +70,9 @@ class DiContainer {
     _injector.map<RequestScreenBuilder>(
         (i) => () => BlocProvider<RequestBloc>(
               child: RequestScreen(),
-              bloc: RequestBloc(),
+              bloc: RequestBloc(
+                  streamService: i.get<StreamService>(),
+                  repository: i.get<Repository>()),
             ),
         isSingleton: true);
   }

@@ -4,6 +4,22 @@ import 'package:quality_control/entity/user.dart';
 
 // Заявка
 class Request {
+  Request(
+      {this.id,
+      this.number,
+      this.dateFrom,
+      this.dateTo,
+      this.intervals,
+      this.routeFrom,
+      this.routeTo,
+      this.routeDescription,
+      this.customer,
+      this.customerDelegat,
+      this.comment,
+      this.note,
+      this.events,
+      this.isReadOnly});
+
   String id;
   int number;
   DateTime dateFrom; // дата работы "с"

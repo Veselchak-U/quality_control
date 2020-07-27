@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/request_bloc.dart';
+import 'package:quality_control/entity/request_interval_item.dart';
+import 'package:quality_control/util/utils.dart';
 
-class RequestScreenIntervalItem extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _RequestScreenIntervalItemState();
-}
+class RequestScreenIntervalItem extends StatelessWidget {
+  RequestScreenIntervalItem(this.item, this.bloc);
 
-class _RequestScreenIntervalItemState extends State<RequestScreenIntervalItem> {
-  RequestBloc _bloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _bloc = BlocProvider.of(context);
-    _bloc.context = context;
-  }
+  final RequestIntervalItem item;
+  final RequestBloc bloc;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        height: 200,
-        color: Colors.white,
-        child: Center(
-            child: Text(
-          'RequestScreenIntervalItem',
-          style: TextStyle(fontSize: 24, color: Colors.black38),
-        )));
+    return Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text('№${item.number}')),
+                Padding(
+                    padding: EdgeInsets.only(right: 16),
+                    child: Text(Utils.extractDate(item.interval.dateBegin))),
+                Text(Utils.extractIntervalTime(item.interval)),
+              ],
+            ),
+            Row(
+              children: [],
+            ),
+            Row(
+              children: [],
+            ),
+          ],
+        ));
   }
 }

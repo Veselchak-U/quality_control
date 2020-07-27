@@ -17,6 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme:
+            TextTheme(bodyText2: TextStyle(fontFamily: 'Roboto', fontSize: 18)),
       ),
       home: DiContainer.getStartupScreen(),
     );

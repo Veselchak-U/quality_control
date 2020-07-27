@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/request_bloc.dart';
+import 'package:quality_control/entity/request_interval_item.dart';
+import 'package:quality_control/ui/request_screen_interval_item.dart';
 
 class RequestScreen extends StatefulWidget {
   @override
@@ -20,13 +22,33 @@ class _RequestScreenState extends State<RequestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.white,
-        child: Center(
-            child: Text(
-          'RequestScreen',
-          style: TextStyle(fontSize: 24, color: Colors.black38),
-        )));
+    return Scaffold(
+      appBar: AppBar(title: Text('Список интервалов'),),
+      body: StreamBuilder(
+        stream: _bloc.outRequestIntervalItems,
+        builder: (BuildContext context,
+            AsyncSnapshot<List<RequestIntervalItem>> snapshot) {
+          if (snapshot.data == null || snapshot.data.isEmpty) {
+            return Center(
+                child: Text(
+                  'Заявок нет',
+                  style: TextStyle(fontSize: 20, color: Colors.black38),
+                ));
+          } else {
+            return ListView.separated(
+                padding: EdgeInsets.all(0),
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) =>
+                    RequestScreenIntervalItem(snapshot.data[index], _bloc),
+                separatorBuilder: (BuildContext context, int index) =>
+                const Divider(
+                  thickness: 2,
+                  color: Colors.black12,
+                ));
+          }
+        },
+      ),
+    );
   }
 }
 

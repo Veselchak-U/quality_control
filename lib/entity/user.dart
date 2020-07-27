@@ -1,6 +1,12 @@
-// Пользователь (водитель, представитель заказчика, ответственное лицо по регламентной заявке)
+// Пользователь
 class User {
-  User({this.id, this.userRole, this.lastName, this.firstName, this.middleName, this.phone});
+  User(
+      {this.id,
+      this.userRole,
+      this.lastName,
+      this.firstName,
+      this.middleName,
+      this.phone});
 
   String id;
   UserRole userRole;
@@ -10,6 +16,5 @@ class User {
   String phone;
 }
 
-enum UserRole {
-  DRIVER, DELEGAT, OTHER
-}
+// Роль пользователя: водитель, представитель заказчика, ответственное лицо по регламентной заявке
+enum UserRole { DRIVER, DELEGAT, OTHER }
