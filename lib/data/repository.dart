@@ -19,9 +19,9 @@ class Repository {
   final StreamService _streamService;
   final FimberLog _log = FimberLog('Repository');
   User _currentUser;
-  List<Status> statusReferences;
-  List<Rating> ratingReferences;
-  List<Request> _requests;
+  List<Status> statusReferences; // справочник статусов
+  List<Rating> ratingReferences; // справочник оценок
+  List<Request> _requests; // текущие заявки
 
   Future<bool> initialize({@required User user}) async {
     _log.d('initialize() start');
@@ -38,3 +38,4 @@ class Repository {
     return true;
   }
 }
+

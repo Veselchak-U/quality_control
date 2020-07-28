@@ -34,4 +34,10 @@ class Request {
   String note; // примечание к заявке
   List<Event> events; // события по заявке
   bool isReadOnly; // чужая заявка, только на чтение
+
+  String intervalsToString() {
+    String result = '';
+    // TODO(dyv): доделать
+    return result;
+  }
 }
