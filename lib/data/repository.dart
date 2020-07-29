@@ -12,6 +12,7 @@ class Repository {
       {@required IDataSource dataSource, @required StreamService streamService})
       : _dataSource = dataSource,
         _streamService = streamService {
+    streamService.refreshData.listen(_onRefreshDataEvent); // входящие события о небходимости обновить данные
     _log.i('create');
   }
 
@@ -28,8 +29,10 @@ class Repository {
 
     await _dataSource.initialize();
     _currentUser = user;
-    statusReferences = await _dataSource.getStatusReferences(user: _currentUser);
-    ratingReferences = await _dataSource.getRatingReferences(user: _currentUser);
+    statusReferences =
+        await _dataSource.getStatusReferences(user: _currentUser);
+    ratingReferences =
+        await _dataSource.getRatingReferences(user: _currentUser);
     _requests = await _dataSource.loadRequests(user: _currentUser);
     _streamService.listRequests.add(_requests);
     _log.d('listRequests.add ${_requests.length} items');
@@ -37,5 +40,11 @@ class Repository {
     _log.d('initialize() end');
     return true;
   }
-}
 
+  // обработчик входящих событий о небходимости обновить данные
+  void _onRefreshDataEvent(RefreshDataEvent event) {
+    if (event == RefreshDataEvent.REFRESH_REQUESTS) {
+      _streamService.listRequests.add(_requests);
+    }
+  }
+}

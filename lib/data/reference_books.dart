@@ -101,7 +101,7 @@ class ReferenceBooks {
           customerDelegat: User(
               id: '11',
               userRole: UserRole.DELEGAT,
-              lastName: 'Представитель 1',
+              lastName: 'Петров',
               firstName: 'Петр',
               middleName: 'Петрович',
               phone: '+799911110001'),
@@ -133,7 +133,7 @@ class ReferenceBooks {
           customerDelegat: User(
               id: '12',
               userRole: UserRole.DELEGAT,
-              lastName: 'Представитель 2',
+              lastName: 'Сидоров',
               firstName: 'Сидор',
               middleName: 'Сидорович',
               phone: '+799911110002'),

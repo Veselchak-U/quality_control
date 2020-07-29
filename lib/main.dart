@@ -4,7 +4,7 @@ import 'package:quality_control/di/di_container.dart';
 
 void main() {
   Fimber.plantTree(DebugTree()); // init logger
-  DiContainer.initialize(); // init Dependency Injector
+  DiContainer.initialize(); // init dependency injector
   runApp(MyApp());
 }
 
@@ -17,8 +17,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        textTheme:
-            TextTheme(bodyText2: TextStyle(fontFamily: 'Roboto', fontSize: 18)),
+        textTheme: TextTheme(
+//            headline2: TextStyle(fontFamily: 'Roboto', fontSize: 18),
+            bodyText2: TextStyle(fontFamily: 'Roboto', fontSize: 16)),
       ),
       home: DiContainer.getStartupScreen(),
     );

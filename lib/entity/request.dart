@@ -37,7 +37,14 @@ class Request {
 
   String intervalsToString() {
     String result = '';
-    // TODO(dyv): доделать
+    if (intervals != null && intervals.isNotEmpty) {
+      Set<String> set = <String>{};
+      intervals.forEach((Interval i) {
+        set.add(i.intervalTimes());
+      });
+      result = set.join(', ');
+    }
+
     return result;
   }
 }

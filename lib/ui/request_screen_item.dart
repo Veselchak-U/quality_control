@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/request_bloc.dart';
-import 'package:quality_control/entity/request_interval_item.dart';
+import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
 
-class RequestScreenIntervalItem extends StatelessWidget {
-  RequestScreenIntervalItem(this.item, this.bloc);
+class RequestScreenItem extends StatelessWidget {
+  RequestScreenItem(this.request, this.bloc);
 
-  final RequestIntervalItem item;
+  final Request request;
   final RequestBloc bloc;
 
   @override
@@ -16,6 +16,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
         child: Column(
           children: [
             Row(
+//              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                     decoration: BoxDecoration(
@@ -26,15 +27,17 @@ class RequestScreenIntervalItem extends StatelessWidget {
                       color: _getStatusColor(),
                     ),
                     padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
-                    child: Text('Заявка: ${item.number}',style: TextStyle(color: Colors.white),)),
+                    child: Text(
+                      'Заявка: ${request.number}',
+                      style: TextStyle(color: Colors.white),
+                    )),
                 Expanded(child: SizedBox.shrink()),
                 Padding(
                     padding: EdgeInsets.only(right: 8),
-                    child: Text(item.interval.dateBegin.toStringForHuman())),
-                Text(
-                  item.intervalTimes(),
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                    child: Text(
+                      '${request.dateFrom.toStringForHuman()} - ${request.dateTo.toStringForHuman()}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
               ],
             ),
             SizedBox(
@@ -46,11 +49,28 @@ class RequestScreenIntervalItem extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(right: 8),
                   child: Text(
+                    'Интервалы:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Flexible(child: Text(request.intervalsToString())),
+              ],
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(right: 8),
+                  child: Text(
                     'Маршрут:',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-                Flexible(child: Text('${item.routeFrom} - ${item.routeTo}')),
+                Flexible(
+                    child: Text('${request.routeFrom} - ${request.routeTo}')),
               ],
             ),
             SizedBox(
@@ -68,7 +88,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
                 ),
                 Flexible(
                     child: Text(
-                        '${item.customer} - ${item.customerDelegat.lastName} ${item.customerDelegat.firstName} ${item.customerDelegat.middleName}')),
+                        '${request.customer} - ${request.customerDelegat.lastName} ${request.customerDelegat.firstName} ${request.customerDelegat.middleName}')),
               ],
             ),
           ],

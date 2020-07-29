@@ -19,24 +19,24 @@ class DummyDataSource implements IDataSource {
 
   @override
   Future<bool> initialize() {
-    return Future<bool>.delayed(Duration(seconds: 1), () => true);
+    return Future<bool>.delayed(Duration(milliseconds: 100), () => true);
   }
 
   @override
   Future<List<Request>> loadRequests({User user}) {
     return Future<List<Request>>.delayed(
-        Duration(milliseconds: 500), () => ReferenceBooks.getRequests());
+        Duration(milliseconds: 100), () => ReferenceBooks.getRequests());
   }
 
   @override
   Future<List<Rating>> getRatingReferences({@required User user}) async {
     return Future<List<Rating>>.delayed(
-        Duration(milliseconds: 500), () => ReferenceBooks.ratingReference);
+        Duration(milliseconds: 100), () => ReferenceBooks.ratingReference);
   }
 
   @override
   Future<List<Status>> getStatusReferences({@required User user}) async {
     return Future<List<Status>>.delayed(
-        Duration(milliseconds: 500), () => ReferenceBooks.statusReference);
+        Duration(milliseconds: 100), () => ReferenceBooks.statusReference);
   }
 }

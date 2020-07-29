@@ -18,4 +18,6 @@ class RequestIntervalItem {
   String routeTo; // маршрут куда
   String customer; // заказчик
   User customerDelegat; // представитель заказчика
+
+  String intervalTimes() => interval.intervalTimes();
 }

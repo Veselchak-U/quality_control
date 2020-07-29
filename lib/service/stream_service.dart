@@ -4,13 +4,12 @@ import 'package:quality_control/entity/interval.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/request_interval_item.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:quality_control/extention/datetime_extension.dart';
+import 'package:quality_control/extension/datetime_extension.dart';
 
 class StreamService {
   StreamService() {
-    requestFilterByDate =
-        FilterByDate.TODAY; // фильтр заявок по-умолчанию (дата)
-    requestFilterByText = ''; // фильтр заявок по-умолчанию (текст)
+    _requestFilterByDate = FilterByDate.TODAY;
+    _requestFilterByText = '';
     listRequests.map(_filterRequests).listen(listRequestItems.add);
     listRequests
         .map(_convertRequestToRequestIntervalItem)
@@ -35,16 +34,38 @@ class StreamService {
   final BehaviorSubject<List<Event>> listEvents =
       BehaviorSubject<List<Event>>();
 
-  FilterByDate requestFilterByDate;
-  String requestFilterByText;
+  // События о необходимости обновления данных
+  final PublishSubject<RefreshDataEvent> refreshData =
+      PublishSubject<RefreshDataEvent>();
+
   final FimberLog _log = FimberLog('StreamService');
+
+  // фильтр заявок по-умолчанию (дата)
+  FilterByDate _requestFilterByDate;
+
+  FilterByDate get requestFilterByDate => _requestFilterByDate;
+
+  set requestFilterByDate(FilterByDate value) {
+    _requestFilterByDate = value;
+    refreshData.add(RefreshDataEvent.REFRESH_REQUESTS);
+  }
+
+  // фильтр заявок по-умолчанию (текст)
+  String _requestFilterByText;
+
+  String get requestFilterByText => _requestFilterByText;
+
+  set requestFilterByText(String value) {
+    _requestFilterByText = value;
+    refreshData.add(RefreshDataEvent.REFRESH_REQUESTS);
+  }
 
   List<Request> _filterRequests(List<Request> inRequests) {
     // Сначала фильтруем заявки по дате
     List<Request> filteredByDate = [];
     var today = DateTime.now().trunc();
 
-    if (requestFilterByDate == FilterByDate.TODAY) {
+    if (_requestFilterByDate == FilterByDate.TODAY) {
       inRequests.forEach((Request request) {
         var index = request.intervals
             .indexWhere((Interval i) => i.dateBegin.trunc() == today);
@@ -52,7 +73,7 @@ class StreamService {
           filteredByDate.add(request);
         }
       });
-    } else if (requestFilterByDate == FilterByDate.BEFORE) {
+    } else if (_requestFilterByDate == FilterByDate.BEFORE) {
       inRequests.forEach((Request request) {
         var index = request.intervals
             .indexWhere((Interval i) => i.dateBegin.trunc().isBefore(today));
@@ -60,7 +81,7 @@ class StreamService {
           filteredByDate.add(request);
         }
       });
-    } else if (requestFilterByDate == FilterByDate.AFTER) {
+    } else if (_requestFilterByDate == FilterByDate.AFTER) {
       inRequests.forEach((Request request) {
         var index = request.intervals
             .indexWhere((Interval i) => i.dateBegin.trunc().isAfter(today));
@@ -73,10 +94,10 @@ class StreamService {
     // Затем фильтруем заявки по тексту поиска
     List<Request> filteredByText = [];
 
-    if (requestFilterByText.isEmpty) {
+    if (_requestFilterByText.isEmpty) {
       filteredByText = filteredByDate;
     } else {
-      var searchString = requestFilterByText.toLowerCase();
+      var searchString = _requestFilterByText.toLowerCase();
       filteredByDate.forEach((Request r) {
         var data1 =
             '${r.number}${r.dateFrom.toStringForHuman()}${r.dateTo.toStringForHuman()}${r.intervalsToString()}';
@@ -121,19 +142,19 @@ class StreamService {
     List<RequestIntervalItem> filteredByDate = [];
     var today = DateTime.now().trunc();
 
-    if (requestFilterByDate == FilterByDate.TODAY) {
+    if (_requestFilterByDate == FilterByDate.TODAY) {
       inItems.forEach((RequestIntervalItem item) {
         if (item.interval.dateBegin.trunc() == today) {
           filteredByDate.add(item);
         }
       });
-    } else if (requestFilterByDate == FilterByDate.BEFORE) {
+    } else if (_requestFilterByDate == FilterByDate.BEFORE) {
       inItems.forEach((RequestIntervalItem item) {
         if (item.interval.dateBegin.trunc().isBefore(today)) {
           filteredByDate.add(item);
         }
       });
-    } else if (requestFilterByDate == FilterByDate.AFTER) {
+    } else if (_requestFilterByDate == FilterByDate.AFTER) {
       inItems.forEach((RequestIntervalItem item) {
         if (item.interval.dateBegin.trunc().isAfter(today)) {
           filteredByDate.add(item);
@@ -144,10 +165,10 @@ class StreamService {
     // Затем фильтруем интервалы по тексту поиска
     List<RequestIntervalItem> filteredByText = [];
 
-    if (requestFilterByText.isEmpty) {
+    if (_requestFilterByText.isEmpty) {
       filteredByText = filteredByDate;
     } else {
-      var searchString = requestFilterByText.toLowerCase();
+      var searchString = _requestFilterByText.toLowerCase();
       filteredByDate.forEach((RequestIntervalItem i) {
         var data1 =
             '${i.number}${i.interval.dateBegin.toStringForHuman()}'; // TODO(dyv): добавить поиск по времени интервала
@@ -166,3 +187,5 @@ class StreamService {
 }
 
 enum FilterByDate { BEFORE, TODAY, AFTER }
+
+enum RefreshDataEvent { REFRESH_REQUESTS }

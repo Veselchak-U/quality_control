@@ -1,6 +1,6 @@
 extension DateTimeExtension on DateTime {
   String toStringForJson() {
-    return '$year${_withLeadingZero(month)}${_withLeadingZero(day)}';
+    return '$year${_withLeadZero(month)}${_withLeadZero(day)}';
   }
 
   String toStringForHuman() {
@@ -8,7 +8,7 @@ extension DateTimeExtension on DateTime {
     if (this == null) {
       result = null;
     } else {
-      result = '${_withLeadingZero(day)}.${_withLeadingZero(month)}.$year';
+      result = '${_withLeadZero(day)}.${_withLeadZero(month)}.$year';
     }
     return result;
   }
@@ -22,7 +22,7 @@ extension DateTimeExtension on DateTime {
     return result;
   }
 
-  String _withLeadingZero(int number) {
+  String _withLeadZero(int number) {
     String result;
     if (number != null) {
       result = '${number < 10 ? 0 : ''}$number';
