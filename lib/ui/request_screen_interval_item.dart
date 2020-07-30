@@ -11,76 +11,84 @@ class RequestScreenIntervalItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(4),
+    return InkWell(
+      onTap: () {
+        bloc.onTapListItem(requestId: item.requestId, intervalId: item.interval.id);
+      },
+      splashColor: Theme.of(context).accentColor,
+      child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(4),
+                        ),
+                        color: _getStatusColor(),
                       ),
-                      color: _getStatusColor(),
-                    ),
-                    padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
-                    child: Text(
-                      'Заявка: ${item.number}',
-                      style: TextStyle(color: Colors.white),
-                    )),
-                Spacer(),
-                Padding(
+                      padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
+                      child: Text(
+                        'Заявка: ${item.number}',
+                        style: TextStyle(color: Colors.white),
+                      )),
+                  Spacer(),
+                  Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: Text(item.interval.dateBegin.toStringForHuman())),
+                  Text(
+                    item.intervalTimes(),
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
                     padding: EdgeInsets.only(right: 8),
-                    child: Text(item.interval.dateBegin.toStringForHuman())),
-                Text(
-                  item.intervalTimes(),
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: Text(
-                    'Маршрут:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Flexible(child: Text('${item.routeFrom} - ${item.routeTo}')),
-              ],
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: Text(
-                    'Заказчик:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Flexible(
                     child: Text(
-                        '${item.customer} - ${item.customerDelegat.lastName} ${item.customerDelegat.firstName} ${item.customerDelegat.middleName}')),
-              ],
-            ),
-            SizedBox(height: 16,),
-            Divider(
-              thickness: 2,
-              color: Colors.black12,
-            )
-          ],
-        ));
+                      'Маршрут:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Flexible(child: Text('${item.routeFrom} - ${item.routeTo}')),
+                ],
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(right: 8),
+                    child: Text(
+                      'Заказчик:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Flexible(
+                      child: Text(
+                          '${item.customer} - ${item.customerDelegat.lastName} ${item.customerDelegat.firstName} ${item.customerDelegat.middleName}')),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Divider(
+                thickness: 2,
+                color: Colors.black12,
+              )
+            ],
+          )),
+    );
   }
 
   Color _getStatusColor() {

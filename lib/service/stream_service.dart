@@ -15,8 +15,6 @@ class StreamService {
         .map(_convertRequestToRequestIntervalItem)
         .map(_filterRequestsIntervalItem)
         .listen(listRequestIntervalItems.add);
-//    listRequests.listen(toRequestItems);
-//    listRequests.listen(toIntervalItems);
     _log.i('create');
   }
 
@@ -61,22 +59,6 @@ class StreamService {
     _requestFilterByText = value;
     refreshData.add(RefreshDataEvent.REFRESH_REQUESTS);
   }
-
-/*  void toRequestItems(List<Request> inRequests) {
-//    listRequests.map(_filterRequests).listen(listRequestItems.add);
-    var out = _filterRequests(inRequests);
-    listRequestItems.add(out);
-    _log.d('listRequestItems.add(out) ${out.length} request');
-  }*/
-
-/*  void toIntervalItems(List<Request> inRequests) {
-//    listRequests
-//        .map(_convertRequestToRequestIntervalItem)
-//        .map(_filterRequestsIntervalItem)
-//        .listen(listRequestIntervalItems.add);
-    listRequestIntervalItems.add(_filterRequestsIntervalItem(
-        _convertRequestToRequestIntervalItem(inRequests)));
-  }*/
 
   List<Request> _filterRequests(List<Request> inRequests) {
     // Сначала фильтруем заявки по дате
@@ -213,7 +195,6 @@ class StreamService {
     refreshData.close();
     _log.i('dispose');
   }
-
 }
 
 enum FilterByDate { BEFORE, TODAY, AFTER }

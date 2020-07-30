@@ -65,37 +65,44 @@ class ReferenceBooks {
   static List<Request> getRequests() {
     var now = DateTime.now();
     var dayInMonth = DateTime(now.year, now.month + 1, 0).day;
+    var idCounter = 1;
 
     return [
       Request(
           id: '90189',
           number: 8853,
-          dateFrom: DateTime(now.year, now.month, 1),
-          dateTo: DateTime(now.year, now.month, dayInMonth),
+          dateFrom: now.subtract(Duration(days: 12)),
+          //DateTime(now.year, now.month, 1),
+          dateTo: now.add(Duration(days: 1)),
+          //DateTime(now.year, now.month, dayInMonth),
           intervals: List<Interval>.generate(dayInMonth * 4, (int i) {
             i++;
             Interval result;
             if (i % 4 == 0) {
               result = Interval(
+                  id: '${idCounter++}',
                   dateBegin: DateTime(now.year, now.month, i ~/ 4 + 1, 7, 25),
                   dateEnd: DateTime(now.year, now.month, i ~/ 4 + 1, 8, 00));
             } else if (i % 4 == 1) {
               result = Interval(
+                  id: '${idCounter++}',
                   dateBegin: DateTime(now.year, now.month, i ~/ 4 + 1, 12, 30),
                   dateEnd: DateTime(now.year, now.month, i ~/ 4 + 1, 12, 40));
             } else if (i % 4 == 2) {
               result = Interval(
+                  id: '${idCounter++}',
                   dateBegin: DateTime(now.year, now.month, i ~/ 4 + 1, 12, 45),
                   dateEnd: DateTime(now.year, now.month, i ~/ 4 + 1, 13, 15));
             } else if (i % 4 == 3) {
               result = Interval(
+                  id: '${idCounter++}',
                   dateBegin: DateTime(now.year, now.month, i ~/ 4 + 1, 13, 50),
                   dateEnd: DateTime(now.year, now.month, i ~/ 4 + 1, 14, 10));
             }
             return result;
           }),
-          routeFrom: 'УДАЧНЫЙ',
-          routeTo: 'УДАЧНЫЙ',
+          routeFrom: 'Склад Зарница',
+          routeTo: 'ЦХХ (ДАМБА №4)',
           routeDescription: 'Работа по графику.',
           customer: 'АК "АЛРОСА" (ПАО) УМНУ СТ"Алмазавтоматика"',
           customerDelegat: User(
@@ -117,17 +124,19 @@ class ReferenceBooks {
             Interval result;
             if (i % 2 == 0) {
               result = Interval(
+                  id: '${idCounter++}',
                   dateBegin: DateTime(now.year, now.month, i ~/ 2 + 1, 15, 00),
                   dateEnd: DateTime(now.year, now.month, i ~/ 2 + 1, 16, 00));
             } else if (i % 2 == 1) {
               result = Interval(
+                  id: '${idCounter++}',
                   dateBegin: DateTime(now.year, now.month, i ~/ 2 + 1, 16, 30),
                   dateEnd: DateTime(now.year, now.month, i ~/ 2 + 1, 17, 00));
             }
             return result;
           }),
           routeFrom: 'Удачный АУО УМТС',
-          routeTo: 'Удачный АУО УМТС',
+          routeTo: 'Подземный Рудник "Удачный"',
           routeDescription: 'По 325 отчету',
           customer: 'АК "АЛРОСА" (ПАО) УГОК АТТ-3',
           customerDelegat: User(
@@ -138,7 +147,8 @@ class ReferenceBooks {
               middleName: 'Сидорович',
               phone: '+799911110002'),
           comment: '633',
-          note: 'Доставка персонала АУО УМТС: на работу, обед, с работы: Н-город - УМТС(тех.база, нефтебаза, АЗС-1, АЗС-2)')
+          note:
+              'Доставка персонала АУО УМТС: на работу, обед, с работы: Н-город - УМТС(тех.база, нефтебаза, АЗС-1, АЗС-2)')
     ];
   }
 }

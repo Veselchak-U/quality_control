@@ -11,92 +11,98 @@ class RequestScreenItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(4),
+    return InkWell(
+      onTap: () {
+        bloc.onTapListItem(requestId: request.id);
+      },
+      splashColor: Theme.of(context).accentColor,
+      child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(4),
+                        ),
+                        color: _getStatusColor(),
                       ),
-                      color: _getStatusColor(),
-                    ),
-                    padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
-                    child: Text(
-                      'Заявка: ${request.number}',
-                      style: TextStyle(color: Colors.white),
-                    )),
-                Spacer(),
-                Padding(
+                      padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
+                      child: Text(
+                        'Заявка: ${request.number}',
+                        style: TextStyle(color: Colors.white),
+                      )),
+                  Spacer(),
+                  Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: Text(
+                        '${request.dateFrom.toStringForHuman()} - ${request.dateTo.toStringForHuman()}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
                     padding: EdgeInsets.only(right: 8),
                     child: Text(
-                      '${request.dateFrom.toStringForHuman()} - ${request.dateTo.toStringForHuman()}',
+                      'Интервалы:',
                       style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-              ],
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: Text(
-                    'Интервалы:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-                Flexible(child: Text(request.intervalsToString())),
-              ],
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: Text(
-                    'Маршрут:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Flexible(
-                    child: Text('${request.routeFrom} - ${request.routeTo}')),
-              ],
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: Text(
-                    'Заказчик:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Flexible(
+                  Flexible(child: Text(request.intervalsToString())),
+                ],
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(right: 8),
                     child: Text(
-                        '${request.customer} - ${request.customerDelegat.lastName} ${request.customerDelegat.firstName} ${request.customerDelegat.middleName}')),
-              ],
-            ),
-            SizedBox(height: 16,),
-            Divider(
-              thickness: 2,
-              color: Colors.black12,
-            )
-          ],
-        ));
+                      'Маршрут:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Flexible(
+                      child: Text('${request.routeFrom} - ${request.routeTo}')),
+                ],
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(right: 8),
+                    child: Text(
+                      'Заказчик:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Flexible(
+                      child: Text(
+                          '${request.customer} - ${request.customerDelegat.lastName} ${request.customerDelegat.firstName} ${request.customerDelegat.middleName}')),
+                ],
+              ),
+              SizedBox(height: 16,),
+              Divider(
+                thickness: 2,
+                color: Colors.black12,
+              )
+            ],
+          )),
+    );
   }
 
   Color _getStatusColor() {

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/common/i_bloc.dart';
@@ -56,8 +55,6 @@ class RequestBloc extends IBloc {
       currentFilterByDate = newFilter;
       _streamService.requestFilterByDate = currentFilterByDate;
     }
-
-    _log.i('onTapTabBar index = $index');
   }
 
   void changeSearchMode() {
@@ -72,6 +69,10 @@ class RequestBloc extends IBloc {
     currentFilterByText = text;
     _streamService.requestFilterByText = currentFilterByText;
     _log.d('onChangeSearchString text = $text');
+  }
+
+  void onTapListItem({String requestId, String intervalId}) {
+    _log.d('onTapListItem requestId = $requestId, intervalId = $intervalId');
   }
 
   @override

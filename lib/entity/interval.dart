@@ -1,8 +1,9 @@
 
 // Интервал по заявке
 class Interval {
-  Interval({this.dateBegin, this.dateEnd});
+  Interval({this.id, this.dateBegin, this.dateEnd});
 
+  String id;
   DateTime dateBegin;
   DateTime dateEnd;
 

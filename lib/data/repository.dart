@@ -12,7 +12,8 @@ class Repository {
       {@required IDataSource dataSource, @required StreamService streamService})
       : _dataSource = dataSource,
         _streamService = streamService {
-    streamService.refreshData.listen(_onRefreshDataEvent); // входящие события о небходимости обновить данные
+    // входящие события о небходимости обновить данные
+    streamService.refreshData.listen(_onRefreshDataEvent);
     _log.i('create');
   }
 

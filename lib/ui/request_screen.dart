@@ -16,12 +16,6 @@ class _RequestScreenState extends State<RequestScreen>
   RequestBloc _bloc;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchFieldController = TextEditingController();
-  TabController _tabController;
-  final List<Tab> _tabs = <Tab>[
-    Tab(text: 'РАНЕЕ'),
-    Tab(text: 'ТЕКУЩИЕ'),
-    Tab(text: 'ДАЛЕЕ'),
-  ];
 
   @override
   void initState() {
@@ -29,27 +23,24 @@ class _RequestScreenState extends State<RequestScreen>
     _bloc = BlocProvider.of(context);
     _bloc.context = context;
     _searchFieldController.addListener(_onUpdateSearchField);
-    _tabController =
-        TabController(vsync: this, length: _tabs.length, initialIndex: 1);
-//    _tabController = DefaultTabController.of(context);
-//    _tabController.addListener(() {
-//      var index = _tabController.index;
-//      setState(() {
-//        _bloc.onTapFilterByDateBar(index);
-//      });
-//    });
   }
 
   @override
   Widget build(BuildContext context) {
-//    final tabBar = TabBar(
-//      tabs: tabs,
-//      onTap: (int index) {
-//        setState(() {
-//          _bloc.onTapFilterByDateBar(index);
-//        });
-//      },
-//    );
+    final tabs = <Tab>[
+      Tab(text: 'РАНЕЕ'),
+      Tab(text: 'ТЕКУЩИЕ'),
+      Tab(text: 'ДАЛЕЕ'),
+    ];
+
+    final tabBar = TabBar(
+      tabs: tabs,
+      onTap: (int index) {
+        setState(() {
+          _bloc.onTapFilterByDateBar(index);
+        });
+      },
+    );
 
     var normalAppBar = AppBar(
       leading: IconButton(
@@ -79,7 +70,7 @@ class _RequestScreenState extends State<RequestScreen>
           },
         ),
       ],
-//      bottom: tabBar,
+      bottom: tabBar,
     );
 
     final double appBarFontSize =
@@ -131,7 +122,7 @@ class _RequestScreenState extends State<RequestScreen>
           },
         ),
       ],
-//      bottom: tabBar,
+      bottom: tabBar,
     );
 
     var requestList = StreamBuilder(
@@ -201,72 +192,30 @@ class _RequestScreenState extends State<RequestScreen>
       ),
     );
 
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: _bloc.isSearchMode ? searchAppBar : normalAppBar,
-        drawer: drawer,
-        body: CustomScrollView(
-          slivers: [
-            SliverPersistentHeader(
-//              pinned: true,
-              floating: true,
-              delegate: _SliverTabBarDelegate(
-                  tabBar: TabBar(
-                    tabs: _tabs,
-                    controller: _tabController,
-                    labelColor: Colors.blue,
-                  ),
-                  backColor: Colors.white),
-            ),
-            SliverList(
-              delegate: SliverChildListDelegate([
+    return DefaultTabController(
+        length: tabs.length,
+        initialIndex: 1,
+        child: Scaffold(
+            key: _scaffoldKey,
+            appBar: _bloc.isSearchMode ? searchAppBar : normalAppBar,
+            drawer: drawer,
+            body: TabBarView(
+              physics: NeverScrollableScrollPhysics(),
+              children: [
                 if (_bloc.currentListPresentation == ListPresentation.REQUEST)
                   requestList
                 else
-                  requestIntervalList
-              ]),
-            )
-
-//            SliverFillRemaining(
-//              child: _bloc.currentListPresentation == ListPresentation.REQUEST
-//                  ? requestList
-//                  : requestIntervalList,
-//            )
-
-//            SliverFillRemaining(
-//              child: TabBarView(
-//                controller: _tabController,
-//                physics: NeverScrollableScrollPhysics(),
-//                children: [
-//                  if (_bloc.currentListPresentation == ListPresentation.REQUEST)
-//                    requestList
-//                  else
-//                    requestIntervalList,
-//                  if (_bloc.currentListPresentation == ListPresentation.REQUEST)
-//                    requestList
-//                  else
-//                    requestIntervalList,
-//                  if (_bloc.currentListPresentation == ListPresentation.REQUEST)
-//                    requestList
-//                  else
-//                    requestIntervalList,
-//                ],
-//              ),
-//            )
-          ],
-        ));
-
-//    return DefaultTabController(
-//        length: tabs.length,
-//        initialIndex: 1,
-//        child: Scaffold(
-//          key: _scaffoldKey,
-//          appBar: _bloc.isSearchMode ? searchAppBar : normalAppBar,
-//          drawer: drawer,
-//          body: _bloc.currentListPresentation == ListPresentation.REQUEST
-//              ? requestList
-//              : requestIntervalList,
-//        ));
+                  requestIntervalList,
+                if (_bloc.currentListPresentation == ListPresentation.REQUEST)
+                  requestList
+                else
+                  requestIntervalList,
+                if (_bloc.currentListPresentation == ListPresentation.REQUEST)
+                  requestList
+                else
+                  requestIntervalList,
+              ],
+            )));
   }
 
   void _openDrawer() {
@@ -288,34 +237,6 @@ class _RequestScreenState extends State<RequestScreen>
 
   @override
   void dispose() {
-    _tabController.dispose();
     super.dispose();
-  }
-}
-
-class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverTabBarDelegate({@required TabBar tabBar, Color backColor})
-      : _tabBar = tabBar,
-        _backColor = backColor;
-
-  final TabBar _tabBar;
-  final Color _backColor;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-        color: _backColor ?? Theme.of(context).primaryColor, child: _tabBar);
-  }
-
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
   }
 }
