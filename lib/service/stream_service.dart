@@ -15,6 +15,8 @@ class StreamService {
         .map(_convertRequestToRequestIntervalItem)
         .map(_filterRequestsIntervalItem)
         .listen(listRequestIntervalItems.add);
+//    listRequests.listen(toRequestItems);
+//    listRequests.listen(toIntervalItems);
     _log.i('create');
   }
 
@@ -60,6 +62,22 @@ class StreamService {
     refreshData.add(RefreshDataEvent.REFRESH_REQUESTS);
   }
 
+/*  void toRequestItems(List<Request> inRequests) {
+//    listRequests.map(_filterRequests).listen(listRequestItems.add);
+    var out = _filterRequests(inRequests);
+    listRequestItems.add(out);
+    _log.d('listRequestItems.add(out) ${out.length} request');
+  }*/
+
+/*  void toIntervalItems(List<Request> inRequests) {
+//    listRequests
+//        .map(_convertRequestToRequestIntervalItem)
+//        .map(_filterRequestsIntervalItem)
+//        .listen(listRequestIntervalItems.add);
+    listRequestIntervalItems.add(_filterRequestsIntervalItem(
+        _convertRequestToRequestIntervalItem(inRequests)));
+  }*/
+
   List<Request> _filterRequests(List<Request> inRequests) {
     // Сначала фильтруем заявки по дате
     List<Request> filteredByDate = [];
@@ -98,12 +116,13 @@ class StreamService {
       filteredByText = filteredByDate;
     } else {
       var searchString = _requestFilterByText.toLowerCase();
+      var d = String.fromCharCode(0); // delimiter
       filteredByDate.forEach((Request r) {
         var data1 =
-            '${r.number}${r.dateFrom.toStringForHuman()}${r.dateTo.toStringForHuman()}${r.intervalsToString()}';
-        var data2 = '${r.routeFrom}${r.routeTo}';
+            '${r.number}$d${r.dateFrom.toStringForHuman()}$d${r.dateTo.toStringForHuman()}$d${r.intervalsToString()}$d';
+        var data2 = '${r.routeFrom}$d${r.routeTo}$d';
         var data3 =
-            '${r.customer}${r.customerDelegat.lastName}${r.customerDelegat.firstName}${r.customerDelegat.middleName}';
+            '${r.customer}$d${r.customerDelegat.lastName}$d${r.customerDelegat.firstName}$d${r.customerDelegat.middleName}$d';
         var dataString = '$data1$data2$data3'.toLowerCase();
         if (dataString.contains(searchString)) {
           filteredByText.add(r);
@@ -169,12 +188,13 @@ class StreamService {
       filteredByText = filteredByDate;
     } else {
       var searchString = _requestFilterByText.toLowerCase();
+      var d = String.fromCharCode(0); // delimiter
       filteredByDate.forEach((RequestIntervalItem i) {
         var data1 =
-            '${i.number}${i.interval.dateBegin.toStringForHuman()}'; // TODO(dyv): добавить поиск по времени интервала
-        var data2 = '${i.routeFrom}${i.routeTo}';
+            '${i.number}$d${i.interval.dateBegin.toStringForHuman()}$d${i.intervalTimes()}$d';
+        var data2 = '${i.routeFrom}$d${i.routeTo}$d';
         var data3 =
-            '${i.customer}${i.customerDelegat.lastName}${i.customerDelegat.firstName}${i.customerDelegat.middleName}';
+            '${i.customer}$d${i.customerDelegat.lastName}$d${i.customerDelegat.firstName}$d${i.customerDelegat.middleName}$d';
         var dataString = '$data1$data2$data3'.toLowerCase();
         if (dataString.contains(searchString)) {
           filteredByText.add(i);
@@ -184,6 +204,16 @@ class StreamService {
 
     return filteredByText;
   }
+
+  void dispose() {
+    listRequests.close();
+    listRequestItems.close();
+    listRequestIntervalItems.close();
+    listEvents.close();
+    refreshData.close();
+    _log.i('dispose');
+  }
+
 }
 
 enum FilterByDate { BEFORE, TODAY, AFTER }

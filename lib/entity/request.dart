@@ -33,7 +33,7 @@ class Request {
   String comment; // последний комментарий к заявке
   String note; // примечание к заявке
   List<Event> events; // события по заявке
-  bool isReadOnly; // чужая заявка, только на чтение
+  bool isReadOnly; // чужая заявка, только на чтение (своё подразделение, но другой представитель)
 
   String intervalsToString() {
     String result = '';

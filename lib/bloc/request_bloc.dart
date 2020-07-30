@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/common/i_bloc.dart';
@@ -11,24 +13,29 @@ class RequestBloc extends IBloc {
       {@required StreamService streamService, @required Repository repository})
       : _streamService = streamService,
         _repository = repository {
-    outRequests = streamService.listRequests.stream;
+    outRequestsItems = streamService.listRequestItems.stream;
     outRequestIntervalItems = streamService.listRequestIntervalItems.stream;
     currentListPresentation = ListPresentation.INTERVAL;
     currentFilterByDate = streamService.requestFilterByDate;
+    currentFilterByText = streamService.requestFilterByText;
+    isSearchMode = currentFilterByText.isNotEmpty;
     _log.i('create');
   }
 
   final StreamService _streamService;
   final Repository _repository;
-  Stream<List<Request>> outRequests;
+  Stream<List<Request>> outRequestsItems;
   Stream<List<RequestIntervalItem>> outRequestIntervalItems;
 
   ListPresentation currentListPresentation;
   FilterByDate currentFilterByDate;
+  String currentFilterByText;
+  bool isSearchMode;
+
   BuildContext context;
   final FimberLog _log = FimberLog('RequestBloc');
 
-  void changeDisplayPresentation() {
+  void changeListPresentation() {
     if (currentListPresentation == ListPresentation.INTERVAL) {
       currentListPresentation = ListPresentation.REQUEST;
     } else {
@@ -36,7 +43,7 @@ class RequestBloc extends IBloc {
     }
   }
 
-  void onTapTabBar(int index) {
+  void onTapFilterByDateBar(int index) {
     FilterByDate newFilter;
     if (index == 0) {
       newFilter = FilterByDate.BEFORE;
@@ -51,6 +58,20 @@ class RequestBloc extends IBloc {
     }
 
     _log.i('onTapTabBar index = $index');
+  }
+
+  void changeSearchMode() {
+    if (isSearchMode) {
+      currentFilterByText = '';
+      _streamService.requestFilterByText = currentFilterByText;
+    }
+    isSearchMode = !isSearchMode;
+  }
+
+  void onChangeSearchString(String text) {
+    currentFilterByText = text;
+    _streamService.requestFilterByText = currentFilterByText;
+    _log.d('onChangeSearchString text = $text');
   }
 
   @override

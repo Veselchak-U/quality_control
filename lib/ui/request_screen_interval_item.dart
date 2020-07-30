@@ -12,7 +12,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: Column(
           children: [
             Row(
@@ -26,8 +26,11 @@ class RequestScreenIntervalItem extends StatelessWidget {
                       color: _getStatusColor(),
                     ),
                     padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
-                    child: Text('Заявка: ${item.number}',style: TextStyle(color: Colors.white),)),
-                Expanded(child: SizedBox.shrink()),
+                    child: Text(
+                      'Заявка: ${item.number}',
+                      style: TextStyle(color: Colors.white),
+                    )),
+                Spacer(),
                 Padding(
                     padding: EdgeInsets.only(right: 8),
                     child: Text(item.interval.dateBegin.toStringForHuman())),
@@ -71,6 +74,11 @@ class RequestScreenIntervalItem extends StatelessWidget {
                         '${item.customer} - ${item.customerDelegat.lastName} ${item.customerDelegat.firstName} ${item.customerDelegat.middleName}')),
               ],
             ),
+            SizedBox(height: 16,),
+            Divider(
+              thickness: 2,
+              color: Colors.black12,
+            )
           ],
         ));
   }

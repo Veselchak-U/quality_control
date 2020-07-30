@@ -12,11 +12,10 @@ class RequestScreenItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: Column(
           children: [
             Row(
-//              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                     decoration: BoxDecoration(
@@ -31,7 +30,7 @@ class RequestScreenItem extends StatelessWidget {
                       'Заявка: ${request.number}',
                       style: TextStyle(color: Colors.white),
                     )),
-                Expanded(child: SizedBox.shrink()),
+                Spacer(),
                 Padding(
                     padding: EdgeInsets.only(right: 8),
                     child: Text(
@@ -91,6 +90,11 @@ class RequestScreenItem extends StatelessWidget {
                         '${request.customer} - ${request.customerDelegat.lastName} ${request.customerDelegat.firstName} ${request.customerDelegat.middleName}')),
               ],
             ),
+            SizedBox(height: 16,),
+            Divider(
+              thickness: 2,
+              color: Colors.black12,
+            )
           ],
         ));
   }
