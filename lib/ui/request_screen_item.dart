@@ -92,10 +92,12 @@ class RequestScreenItem extends StatelessWidget {
                   ),
                   Flexible(
                       child: Text(
-                          '${request.customer} - ${request.customerDelegat.lastName} ${request.customerDelegat.firstName} ${request.customerDelegat.middleName}')),
+                          '${request.customer} - ${request.customerDelegat.toFullFIO()}')),
                 ],
               ),
-              SizedBox(height: 16,),
+              SizedBox(
+                height: 16,
+              ),
               Divider(
                 thickness: 2,
                 color: Colors.black12,

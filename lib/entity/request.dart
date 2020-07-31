@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/interval.dart';
 import 'package:quality_control/entity/user.dart';
@@ -42,7 +44,9 @@ class Request {
       intervals.forEach((Interval i) {
         set.add(i.intervalTimes());
       });
-      result = set.join(', ');
+      var sortList = set.toList();
+      sortList.sort();
+      result = sortList.join(', ');
     }
 
     return result;

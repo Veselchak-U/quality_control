@@ -13,7 +13,8 @@ class RequestScreenIntervalItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        bloc.onTapListItem(requestId: item.requestId, intervalId: item.interval.id);
+        bloc.onTapListItem(
+            requestId: item.requestId, intervalId: item.interval.id);
       },
       splashColor: Theme.of(context).accentColor,
       child: Padding(
@@ -76,7 +77,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
                   ),
                   Flexible(
                       child: Text(
-                          '${item.customer} - ${item.customerDelegat.lastName} ${item.customerDelegat.firstName} ${item.customerDelegat.middleName}')),
+                          '${item.customer} - ${item.customerDelegat.toFullFIO()}')),
                 ],
               ),
               SizedBox(

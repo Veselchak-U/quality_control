@@ -1,18 +1,27 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
+import 'package:quality_control/bloc/history_bloc.dart';
+import 'package:quality_control/bloc/info_bloc.dart';
 import 'package:quality_control/bloc/login_bloc.dart';
+import 'package:quality_control/bloc/quality_bloc.dart';
 import 'package:quality_control/bloc/request_bloc.dart';
 import 'package:quality_control/bloc/startup_bloc.dart';
+import 'package:quality_control/bloc/status_bloc.dart';
 import 'package:quality_control/data/i_data_source.dart';
 import 'package:quality_control/data/dummy_data_source.dart';
 import 'package:quality_control/data/repository.dart';
 import 'package:quality_control/di/screen_builder.dart';
+import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/service/current_user_service.dart';
 import 'package:quality_control/service/stream_service.dart';
+import 'package:quality_control/ui/history_screen.dart';
+import 'package:quality_control/ui/info_screen.dart';
 import 'package:quality_control/ui/login_screen.dart';
+import 'package:quality_control/ui/quality_screen.dart';
 import 'package:quality_control/ui/request_screen.dart';
 import 'package:quality_control/ui/startup_screen.dart';
+import 'package:quality_control/ui/status_screen.dart';
 
 class DiContainer {
   static Injector _injector;
@@ -40,8 +49,11 @@ class DiContainer {
     _injector.map<Repository>(
         (i) => Repository(
             dataSource: i.get<IDataSource>(),
-            streamService: i.get<StreamService>()),
+            streamService: i.get<StreamService>(),
+            appState: i.get<AppState>()),
         isSingleton: true);
+
+    _injector.map<AppState>((i) => AppState(), isSingleton: true);
 
     _injector.map<CurrentUserService>((i) => CurrentUserService(),
         isSingleton: true);
@@ -72,7 +84,52 @@ class DiContainer {
               child: RequestScreen(),
               bloc: RequestBloc(
                   streamService: i.get<StreamService>(),
-                  repository: i.get<Repository>()),
+                  repository: i.get<Repository>(),
+                  screenBuilder: i.get<ScreenBuilder>()),
+            ),
+        isSingleton: true);
+
+    // Info screen
+    _injector.map<InfoScreenBuilder>(
+        (i) => () => BlocProvider<InfoBloc>(
+              child: InfoScreen(),
+              bloc: InfoBloc(
+                  repository: i.get<Repository>(),
+                  screenBuilder: i.get<ScreenBuilder>(),
+                  appState: i.get<AppState>()),
+            ),
+        isSingleton: true);
+
+    // History screen
+    _injector.map<HistoryScreenBuilder>(
+        (i) => () => BlocProvider<HistoryBloc>(
+              child: HistoryScreen(),
+              bloc: HistoryBloc(
+                  repository: i.get<Repository>(),
+                  screenBuilder: i.get<ScreenBuilder>(),
+                  appState: i.get<AppState>()),
+            ),
+        isSingleton: true);
+
+    // Status screen
+    _injector.map<StatusScreenBuilder>(
+        (i) => () => BlocProvider<StatusBloc>(
+              child: StatusScreen(),
+              bloc: StatusBloc(
+                  repository: i.get<Repository>(),
+                  screenBuilder: i.get<ScreenBuilder>(),
+                  appState: i.get<AppState>()),
+            ),
+        isSingleton: true);
+
+    // Quality screen
+    _injector.map<QualityScreenBuilder>(
+        (i) => () => BlocProvider<QualityBloc>(
+              child: QualityScreen(),
+              bloc: QualityBloc(
+                  repository: i.get<Repository>(),
+                  screenBuilder: i.get<ScreenBuilder>(),
+                  appState: i.get<AppState>()),
             ),
         isSingleton: true);
   }

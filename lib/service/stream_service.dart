@@ -1,4 +1,5 @@
 import 'package:fimber/fimber.dart';
+import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/interval.dart';
 import 'package:quality_control/entity/request.dart';
@@ -17,6 +18,10 @@ class StreamService {
         .listen(listRequestIntervalItems.add);
     _log.i('create');
   }
+
+  // Текущее состояние приложения
+  final BehaviorSubject<AppState> appState =
+      BehaviorSubject<AppState>();
 
   // Заявки - входящий поток
   final BehaviorSubject<List<Request>> listRequests =

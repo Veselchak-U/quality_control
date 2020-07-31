@@ -29,7 +29,7 @@ class _RequestScreenState extends State<RequestScreen>
   Widget build(BuildContext context) {
     final tabs = <Tab>[
       Tab(text: 'РАНЕЕ'),
-      Tab(text: 'ТЕКУЩИЕ'),
+      Tab(text: 'СЕГОДНЯ'),
       Tab(text: 'ДАЛЕЕ'),
     ];
 
@@ -47,9 +47,9 @@ class _RequestScreenState extends State<RequestScreen>
         icon: Icon(Icons.menu),
         onPressed: _openDrawer,
       ),
-      title: _bloc.currentListPresentation == ListPresentation.REQUEST
-          ? Text('Список заявок')
-          : Text('Список интервалов'),
+      title: _bloc.isRequestPresentation
+          ? Text('Заявки')
+          : Text('Интервалы работы'),
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.search),
@@ -60,7 +60,7 @@ class _RequestScreenState extends State<RequestScreen>
           },
         ),
         IconButton(
-          icon: _bloc.currentListPresentation == ListPresentation.REQUEST
+          icon: _bloc.isRequestPresentation
               ? Icon(Icons.format_list_numbered)
               : Icon(Icons.format_list_numbered_rtl),
           onPressed: () {
@@ -112,7 +112,7 @@ class _RequestScreenState extends State<RequestScreen>
       ),
       actions: <Widget>[
         IconButton(
-          icon: _bloc.currentListPresentation == ListPresentation.REQUEST
+          icon: _bloc.isRequestPresentation
               ? Icon(Icons.format_list_numbered)
               : Icon(Icons.format_list_numbered_rtl),
           onPressed: () {
@@ -202,15 +202,15 @@ class _RequestScreenState extends State<RequestScreen>
             body: TabBarView(
               physics: NeverScrollableScrollPhysics(),
               children: [
-                if (_bloc.currentListPresentation == ListPresentation.REQUEST)
+                if (_bloc.isRequestPresentation)
                   requestList
                 else
                   requestIntervalList,
-                if (_bloc.currentListPresentation == ListPresentation.REQUEST)
+                if (_bloc.isRequestPresentation)
                   requestList
                 else
                   requestIntervalList,
-                if (_bloc.currentListPresentation == ListPresentation.REQUEST)
+                if (_bloc.isRequestPresentation)
                   requestList
                 else
                   requestIntervalList,

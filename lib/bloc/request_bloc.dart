@@ -3,15 +3,20 @@ import 'package:fimber/fimber.dart';
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/common/i_bloc.dart';
 import 'package:quality_control/data/repository.dart';
+import 'package:quality_control/di/screen_builder.dart';
+import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/request_interval_item.dart';
 import 'package:quality_control/service/stream_service.dart';
 
 class RequestBloc extends IBloc {
   RequestBloc(
-      {@required StreamService streamService, @required Repository repository})
+      {@required StreamService streamService,
+      @required Repository repository,
+      @required ScreenBuilder screenBuilder})
       : _streamService = streamService,
-        _repository = repository {
+        _repository = repository,
+        _screenBuilder = screenBuilder {
     outRequestsItems = streamService.listRequestItems.stream;
     outRequestIntervalItems = streamService.listRequestIntervalItems.stream;
     currentListPresentation = ListPresentation.INTERVAL;
@@ -23,6 +28,7 @@ class RequestBloc extends IBloc {
 
   final StreamService _streamService;
   final Repository _repository;
+  final ScreenBuilder _screenBuilder;
   Stream<List<Request>> outRequestsItems;
   Stream<List<RequestIntervalItem>> outRequestIntervalItems;
 
@@ -33,6 +39,9 @@ class RequestBloc extends IBloc {
 
   BuildContext context;
   final FimberLog _log = FimberLog('RequestBloc');
+
+  bool get isRequestPresentation =>
+      currentListPresentation == ListPresentation.REQUEST;
 
   void changeListPresentation() {
     if (currentListPresentation == ListPresentation.INTERVAL) {
@@ -73,6 +82,24 @@ class RequestBloc extends IBloc {
 
   void onTapListItem({String requestId, String intervalId}) {
     _log.d('onTapListItem requestId = $requestId, intervalId = $intervalId');
+    _repository.setAppState(
+        newAppState: AppState(requestId: requestId, intervalId: intervalId));
+
+    var index = _repository.appState.bottomNavigationBarIndex;
+    Widget Function() nextScreen;
+    if (index == 0) {
+      nextScreen = _screenBuilder.getInfoScreenBuilder();
+    } else if (index == 1) {
+      nextScreen = _screenBuilder.getHistoryScreenBuilder();
+    } else if (index == 2) {
+      nextScreen = _screenBuilder.getStatusScreenBuilder();
+    } else if (index == 3) {
+      nextScreen = _screenBuilder.getQualityScreenBuilder();
+    }
+    Navigator.push(
+        context,
+        MaterialPageRoute<Widget>(
+            builder: (BuildContext context) => nextScreen()));
   }
 
   @override
@@ -80,5 +107,3 @@ class RequestBloc extends IBloc {
     _log.i('dispose');
   }
 }
-
-enum ListPresentation { INTERVAL, REQUEST }
