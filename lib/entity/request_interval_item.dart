@@ -1,4 +1,4 @@
-import 'package:quality_control/entity/interval.dart';
+import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/user.dart';
 
 class RequestIntervalItem {
@@ -13,7 +13,7 @@ class RequestIntervalItem {
 
   String requestId; // id заявки
   int number; // номер заявки
-  Interval interval; // интервал
+  WorkInterval interval; // интервал
   String routeFrom; // маршрут откуда
   String routeTo; // маршрут куда
   String customer; // заказчик

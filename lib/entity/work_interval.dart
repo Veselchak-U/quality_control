@@ -1,7 +1,7 @@
 
-// Интервал по заявке
-class Interval {
-  Interval({this.id, this.dateBegin, this.dateEnd});
+// Интервал работы по заявке
+class WorkInterval {
+  WorkInterval({this.id, this.dateBegin, this.dateEnd});
 
   String id;
   DateTime dateBegin;

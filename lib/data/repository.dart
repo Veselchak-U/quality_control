@@ -2,7 +2,8 @@ import 'package:fimber/fimber.dart';
 import 'package:flutter/foundation.dart';
 import 'package:quality_control/data/i_data_source.dart';
 import 'package:quality_control/entity/app_state.dart';
-import 'package:quality_control/entity/interval.dart';
+import 'package:quality_control/entity/event.dart';
+import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/status.dart';
@@ -108,7 +109,7 @@ class Repository {
     if (requestId != null) {
       result = _requests.firstWhere((element) => element.id == requestId);
     } else if (intervalId != null) {
-      Interval interval;
+      WorkInterval interval;
       for (var req in _requests) {
         result = req;
         interval = result.intervals?.firstWhere(
@@ -118,5 +119,13 @@ class Repository {
       }
     }
     return result;
+  }
+
+  void addEvent({@required String requestId, @required Event event}) {
+    _dataSource.addEvent(requestId: requestId, event: event);
+    var request = getRequestById(requestId: requestId);
+    request.events ??= [];
+    request.events.add(event);
+    _streamService.listRequests.add(_requests);
   }
 }

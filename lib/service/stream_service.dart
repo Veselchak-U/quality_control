@@ -1,7 +1,7 @@
 import 'package:fimber/fimber.dart';
 import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/entity/event.dart';
-import 'package:quality_control/entity/interval.dart';
+import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/request_interval_item.dart';
 import 'package:rxdart/rxdart.dart';
@@ -73,7 +73,7 @@ class StreamService {
     if (_requestFilterByDate == FilterByDate.TODAY) {
       inRequests.forEach((Request request) {
         var index = request.intervals
-            .indexWhere((Interval i) => i.dateBegin.trunc() == today);
+            .indexWhere((WorkInterval i) => i.dateBegin.trunc() == today);
         if (index != -1) {
           filteredByDate.add(request);
         }
@@ -81,7 +81,7 @@ class StreamService {
     } else if (_requestFilterByDate == FilterByDate.BEFORE) {
       inRequests.forEach((Request request) {
         var index = request.intervals
-            .indexWhere((Interval i) => i.dateBegin.trunc().isBefore(today));
+            .indexWhere((WorkInterval i) => i.dateBegin.trunc().isBefore(today));
         if (index != -1) {
           filteredByDate.add(request);
         }
@@ -89,7 +89,7 @@ class StreamService {
     } else if (_requestFilterByDate == FilterByDate.AFTER) {
       inRequests.forEach((Request request) {
         var index = request.intervals
-            .indexWhere((Interval i) => i.dateBegin.trunc().isAfter(today));
+            .indexWhere((WorkInterval i) => i.dateBegin.trunc().isAfter(today));
         if (index != -1) {
           filteredByDate.add(request);
         }
@@ -106,7 +106,7 @@ class StreamService {
       var d = String.fromCharCode(0); // delimiter
       filteredByDate.forEach((Request r) {
         var data1 =
-            '${r.number}$d${r.dateFrom.toStringForHuman()}$d${r.dateTo.toStringForHuman()}$d${r.intervalsToString()}$d';
+            '${r.number}$d${r.dateFrom.toStringForHuman()}$d${r.dateTo.toStringForHuman()}$d${r.allIntervalsToString()}$d';
         var data2 = '${r.routeFrom}$d${r.routeTo}$d';
         var data3 =
             '${r.customer}$d${r.customerDelegat.lastName}$d${r.customerDelegat.firstName}$d${r.customerDelegat.middleName}$d';
@@ -126,7 +126,7 @@ class StreamService {
     RequestIntervalItem item;
 
     requests.forEach((Request request) {
-      request.intervals.forEach((Interval interval) {
+      request.intervals.forEach((WorkInterval interval) {
         item = RequestIntervalItem(
             requestId: request.id,
             number: request.number,

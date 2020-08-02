@@ -4,7 +4,11 @@ import 'package:quality_control/bloc/common/i_bloc.dart';
 import 'package:quality_control/data/repository.dart';
 import 'package:quality_control/di/screen_builder.dart';
 import 'package:quality_control/entity/app_state.dart';
+import 'package:quality_control/entity/event.dart';
+import 'package:quality_control/entity/status.dart';
+import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/request.dart';
+import 'package:quality_control/extension/datetime_extension.dart';
 
 class StatusBloc extends IBloc {
   StatusBloc(
@@ -13,14 +17,28 @@ class StatusBloc extends IBloc {
       @required AppState appState})
       : _repository = repository,
         _screenBuilder = screenBuilder,
-        currentRequest =
-            repository.getRequestById(requestId: appState.requestId) {
+        request = repository.getRequestById(requestId: appState.requestId) {
+    intervalDates = request.getDatesFromIntervals();
+    selectedDate = DateTime.now().trunc();
+    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+    selectedInterval = intervalsByDate[0];
+    statusReferences = _repository.statusReferences;
     _log.i('create');
   }
 
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
-  final Request currentRequest;
+  final Request request; // заявка
+  List<DateTime> intervalDates; // даты из интервалов по заявке
+  List<WorkInterval> intervalsByDate; // интервалы по текущей дате
+  DateTime selectedDate;
+  WorkInterval selectedInterval;
+  List<Status> statusReferences;
+  Status selectedStatus;
+  DateTime selectedFactDate;
+  TimeOfDay selectedFactTime;
+  String inputedComments;
+
   final int bottomNavigationBarIndex = 2;
   BuildContext context;
   final FimberLog _log = FimberLog('StatusBloc');
@@ -44,9 +62,30 @@ class StatusBloc extends IBloc {
           context,
           PageRouteBuilder<Widget>(
               pageBuilder: (BuildContext context, Animation<double> animation,
-                  Animation<double> secondaryAnimation) =>
+                      Animation<double> secondaryAnimation) =>
                   nextScreen()));
     }
+  }
+
+  void updateIntervalList({DateTime date}) {
+    selectedDate = date;
+    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+    selectedInterval = intervalsByDate[0];
+    _log.i('updateIntervalList currentDate = $selectedDate');
+  }
+
+  void onTapAddButton() {
+    var event = Event(
+        systemDate: DateTime.now(),
+        userDate: selectedFactDate.trunc().add(Duration(
+            hours: selectedFactTime.hour, minutes: selectedFactTime.minute)),
+        user: _repository.appState.user,
+        dateRequest: selectedDate,
+        intervalRequest: selectedInterval,
+        eventType: EventType.SET_STATUS,
+        statusLabel: selectedStatus.label,
+        comment: inputedComments);
+    _repository.addEvent(requestId: request.id, event: event);
   }
 
   @override

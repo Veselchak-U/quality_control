@@ -1,4 +1,4 @@
-import 'package:quality_control/entity/interval.dart';
+import 'package:quality_control/entity/work_interval.dart';
 
 class Utils {
 //  static String extractDate(DateTime date) {

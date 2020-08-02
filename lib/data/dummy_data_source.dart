@@ -2,6 +2,7 @@ import 'package:fimber/fimber.dart';
 import 'package:flutter/foundation.dart';
 import 'package:quality_control/data/i_data_source.dart';
 import 'package:quality_control/data/reference_books.dart';
+import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/status.dart';
@@ -38,5 +39,10 @@ class DummyDataSource implements IDataSource {
   Future<List<Status>> getStatusReferences({@required User user}) async {
     return Future<List<Status>>.delayed(
         Duration(milliseconds: 100), () => ReferenceBooks.statusReference);
+  }
+
+  @override
+  Future<bool> addEvent({@required String requestId, @required Event event}) {
+    return Future<bool>.delayed(Duration(milliseconds: 100), () => true);
   }
 }

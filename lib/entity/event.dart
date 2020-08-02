@@ -1,4 +1,4 @@
-import 'package:quality_control/entity/interval.dart';
+import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/user.dart';
 
 // Событие по заявке
@@ -19,7 +19,7 @@ class Event {
   DateTime userDate; // время указанное пользователем
   User user; // пользователь, создавший событие
   DateTime dateRequest; // дата из заявки, может не указываться
-  Interval intervalRequest; // интервал из заявки, может не указываться
+  WorkInterval intervalRequest; // интервал из заявки, может не указываться
   EventType eventType; // тип события
   String statusLabel; // метка установленного статуса для события SET_STATUS
   String ratingLabel; // метка выставленной оценки для события SET_RATING

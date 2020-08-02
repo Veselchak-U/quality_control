@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         textTheme: TextTheme(
 //            headline2: TextStyle(fontFamily: 'Roboto', fontSize: 18),
-            bodyText2: TextStyle(fontFamily: 'Roboto', fontSize: 16)),
+            bodyText2: TextStyle(/*fontFamily: 'Roboto', */fontSize: 16)),
       ),
       home: DiContainer.getStartupScreen(),
     );

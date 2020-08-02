@@ -1,8 +1,8 @@
-import 'dart:collection';
-
+import 'package:flutter/foundation.dart';
 import 'package:quality_control/entity/event.dart';
-import 'package:quality_control/entity/interval.dart';
+import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/user.dart';
+import 'package:quality_control/extension/datetime_extension.dart';
 
 // Заявка
 class Request {
@@ -26,7 +26,7 @@ class Request {
   int number;
   DateTime dateFrom; // дата работы "с"
   DateTime dateTo; // дата работы "по"
-  List<Interval> intervals; // список интервалов работы
+  List<WorkInterval> intervals; // список интервалов работы
   String routeFrom; // маршрут откуда
   String routeTo; // маршрут куда
   String routeDescription; // маршрут доп. описание
@@ -35,13 +35,14 @@ class Request {
   String comment; // последний комментарий к заявке
   String note; // примечание к заявке
   List<Event> events; // события по заявке
-  bool isReadOnly; // чужая заявка, только на чтение (своё подразделение, но другой представитель)
+  bool
+      isReadOnly; // чужая заявка, только на чтение (своё подразделение, но другой представитель)
 
-  String intervalsToString() {
+  String allIntervalsToString() {
     String result = '';
     if (intervals != null && intervals.isNotEmpty) {
       Set<String> set = <String>{};
-      intervals.forEach((Interval i) {
+      intervals.forEach((WorkInterval i) {
         set.add(i.intervalTimes());
       });
       var sortList = set.toList();
@@ -51,4 +52,73 @@ class Request {
 
     return result;
   }
+
+  List<DateTime> getDatesFromIntervals() {
+    List<DateTime> result = [];
+
+    if (intervals != null && intervals.isNotEmpty) {
+      Set<DateTime> set = <DateTime>{};
+      intervals.forEach((WorkInterval i) {
+        set.add(i.dateBegin.trunc());
+      });
+      List<DateTime> sortedList = set.toList();
+      sortedList.sort();
+      result = sortedList;
+    }
+
+    return result;
+  }
+
+  List<WorkInterval> getIntervalsByDate({@required DateTime date}) {
+    List<WorkInterval> result = [];
+
+    if (date != null && intervals != null && intervals.isNotEmpty) {
+      List<WorkInterval> shortList = intervals
+          .where((WorkInterval e) => e.dateBegin.trunc() == date.trunc())
+          .toList();
+
+      if (shortList.isNotEmpty) {
+        result = shortList;
+      }
+    }
+    return result;
+  }
+
+
+
+//  Map<DateTime, String> getDatesFromIntervals() {
+//    Map<DateTime, String> result = {};
+//
+//    if (intervals != null && intervals.isNotEmpty) {
+//      Set<DateTime> set = <DateTime>{};
+//      intervals.forEach((Interval i) {
+//        set.add(i.dateBegin.trunc());
+//      });
+//      List<DateTime> sortedList = set.toList();
+//      sortedList.sort();
+//
+//      result = <DateTime, String>{
+//        for (DateTime e in sortedList) e: e.toStringForHuman()
+//      };
+//    }
+//
+//    return result;
+//  }
+//
+//  Map<String, String> getTimeIntervalsByDate({@required DateTime date}) {
+//    Map<String, String> result = {};
+//
+//    if (date != null && intervals != null && intervals.isNotEmpty) {
+//      List<Interval> shortList = intervals
+//          .where((Interval e) => e.dateBegin.trunc() == date.trunc())
+//          .toList();
+//
+//      if (shortList.isNotEmpty) {
+//        result = <String, String>{
+//          for (Interval i in shortList) i.id: i.intervalTimes()
+//        };
+//      }
+//    }
+//    return result;
+//  }
 }

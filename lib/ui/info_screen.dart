@@ -84,7 +84,7 @@ class _InfoScreenState extends State<InfoScreen> {
               ),
               Padding(
                   padding: EdgeInsets.only(left: 16),
-                  child: Text(_request.intervalsToString())),
+                  child: Text(_request.allIntervalsToString())),
               SizedBox(
                 height: 8,
               ),

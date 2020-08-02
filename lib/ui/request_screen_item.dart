@@ -57,7 +57,7 @@ class RequestScreenItem extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Flexible(child: Text(request.intervalsToString())),
+                  Flexible(child: Text(request.allIntervalsToString())),
                 ],
               ),
               SizedBox(
