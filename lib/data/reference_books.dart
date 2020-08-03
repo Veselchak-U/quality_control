@@ -59,7 +59,7 @@ class ReferenceBooks {
           'Вовремя',
           'Всё вышеперечисленное'
         ],
-        isCommentRequired: true,
+        isCommentRequired: false,
         isCanChange: true)
   ];
 

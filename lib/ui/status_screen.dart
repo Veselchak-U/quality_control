@@ -13,6 +13,9 @@ class StatusScreen extends StatefulWidget {
 class _StatusScreenState extends State<StatusScreen> {
   StatusBloc _bloc;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+//  final Color _fillColor = Color(0xfff0f0f0);
+  final Color _fillColor = Color(0xffe5e5e5);
   var dateFieldController = TextEditingController();
   var timeFieldController = TextEditingController();
   var commentFieldController = TextEditingController();
@@ -55,6 +58,7 @@ class _StatusScreenState extends State<StatusScreen> {
     );
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -79,7 +83,7 @@ class _StatusScreenState extends State<StatusScreen> {
                       ),
                       Container(
                         alignment: Alignment.centerRight,
-                        padding: EdgeInsets.only(right: 16),
+                        padding: EdgeInsets.only(right: 32),
                         child: FractionallySizedBox(
                           widthFactor: 0.5,
                           child: DropdownButtonFormField<DateTime>(
@@ -89,8 +93,8 @@ class _StatusScreenState extends State<StatusScreen> {
                             isExpanded: true,
                             decoration: InputDecoration(
                                 contentPadding: EdgeInsets.all(0),
-                                filled: true,
-                                fillColor: Colors.black12,
+                                filled: _bloc.selectedDate == null,
+                                fillColor: _fillColor,
                                 border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(8)))),
@@ -105,14 +109,10 @@ class _StatusScreenState extends State<StatusScreen> {
                                 .toList(),
                             onChanged: (DateTime value) {
                               setState(() {
-//                            _bloc.currentDate = value;
                                 _bloc.updateIntervalList(date: value);
                               });
                             },
                             validator: (DateTime value) {
-//                          if (_currentDate == null) {
-//                            return 'Укажите марку авто';
-//                          }
                               return null;
                             },
                           ),
@@ -127,7 +127,7 @@ class _StatusScreenState extends State<StatusScreen> {
                       ),
                       Container(
                           alignment: Alignment.centerRight,
-                          padding: EdgeInsets.only(right: 16),
+                          padding: EdgeInsets.only(right: 32),
                           child: FractionallySizedBox(
                             widthFactor: 0.5,
                             child: DropdownButtonFormField<WorkInterval>(
@@ -137,8 +137,8 @@ class _StatusScreenState extends State<StatusScreen> {
                               isExpanded: true,
                               decoration: InputDecoration(
                                   contentPadding: EdgeInsets.all(0),
-                                  filled: true,
-                                  fillColor: Colors.black12,
+                                  filled: _bloc.selectedInterval == null,
+                                  fillColor: _fillColor,
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(8)))),
@@ -152,14 +152,10 @@ class _StatusScreenState extends State<StatusScreen> {
                                   .toList(),
                               onChanged: (WorkInterval value) {
                                 setState(() {
-//                            _currentInterval = value;
                                   _bloc.selectedInterval = value;
                                 });
                               },
                               validator: (WorkInterval value) {
-//                          if (_currentDate == null) {
-//                            return 'Укажите марку авто';
-//                          }
                                 return null;
                               },
                             ),
@@ -173,37 +169,35 @@ class _StatusScreenState extends State<StatusScreen> {
                       ),
                       Container(
                         alignment: Alignment.centerRight,
-                        padding: EdgeInsets.only(right: 16),
+                        padding: EdgeInsets.only(right: 32),
                         child: FractionallySizedBox(
                             widthFactor: 0.7,
                             child: DropdownButtonFormField<Status>(
-                              hint: Text('Статус'),
                               elevation: 4,
                               isExpanded: true,
                               decoration: InputDecoration(
                                   contentPadding: EdgeInsets.only(left: 8),
-                                  filled: true,
-                                  fillColor: Colors.black12,
+                                  filled: _bloc.selectedStatus == null,
+                                  fillColor: _fillColor,
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(8)))),
                               items: _bloc.statusReferences
                                   .map((Status e) => DropdownMenuItem<Status>(
                                       child: Align(
-                                          alignment: Alignment.centerLeft,
+                                          alignment: Alignment.center,
                                           child: Text(e.name)),
                                       value: e))
                                   .toList(),
                               onChanged: (Status value) {
                                 setState(() {
-//                            _currentInterval = value;
                                   _bloc.selectedStatus = value;
                                 });
                               },
                               validator: (Status value) {
-//                          if (_currentDate == null) {
-//                            return 'Укажите марку авто';
-//                          }
+                                if (value == null) {
+                                  return 'Обязательное поле';
+                                }
                                 return null;
                               },
                             )),
@@ -219,27 +213,28 @@ class _StatusScreenState extends State<StatusScreen> {
                         height: 8,
                       ),
                       Container(
-                        alignment: Alignment.centerRight,
-                        padding: EdgeInsets.only(right: 16),
+//                        alignment: Alignment.topLeft,
+                        padding: EdgeInsets.only(right: 32),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text('дата'),
-                            SizedBox(width: 8,),
+                            SizedBox(
+                              width: 8,
+                            ),
                             Container(
                               width: 100,
                               child: TextFormField(
                                 decoration: InputDecoration(
 //                                    labelText: 'Дата',
                                     contentPadding: EdgeInsets.only(left: 8),
-                                    filled: true,
-                                    fillColor: Colors.black12,
+                                    filled: _bloc.selectedFactDate == null,
+                                    fillColor: _fillColor,
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(8)))),
                                 readOnly: true,
                                 controller: dateFieldController,
-//                            focusNode: releaseDateFocusNode,
                                 onTap: () {
                                   showDatePicker(
                                           context: context,
@@ -250,18 +245,15 @@ class _StatusScreenState extends State<StatusScreen> {
                                           lastDate: DateTime.now())
                                       .then((DateTime value) {
                                     if (value != null) {
-                                      _bloc.selectedFactDate = value;
-                                      dateFieldController.text =
-                                          value.toStringForHuman();
+                                      setState(() {
+                                        _bloc.selectedFactDate = value;
+                                        dateFieldController.text =
+                                            value.toStringForHuman();
+                                      });
                                     }
                                   });
-//                                FocusScope.of(context)
-//                                    .requestFocus(odometerFocusNode);
                                 },
                                 validator: (String value) {
-//                              if (releaseDate == null) {
-//                                return 'Укажите дату события';
-//                              }
                                   return null;
                                 },
                               ),
@@ -270,37 +262,37 @@ class _StatusScreenState extends State<StatusScreen> {
                               width: 30,
                             ),
                             Text('время'),
-                            SizedBox(width: 8,),
+                            SizedBox(
+                              width: 8,
+                            ),
                             Container(
                               width: 70,
                               child: TextFormField(
                                 decoration: InputDecoration(
 //                                    labelText: 'Время',
                                     contentPadding: EdgeInsets.only(left: 8),
-                                    filled: true,
-                                    fillColor: Colors.black12,
+                                    filled: _bloc.selectedFactTime == null,
+                                    fillColor: _fillColor,
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(8)))),
                                 readOnly: true,
                                 controller: timeFieldController,
-//                            focusNode: releaseDateFocusNode,
                                 onTap: () {
                                   showTimePicker(
                                           context: context,
                                           initialTime: TimeOfDay.now())
                                       .then((TimeOfDay value) {
                                     if (value != null) {
-                                      _bloc.selectedFactTime = value;
-                                      timeFieldController.text =
-                                          '${value.hour < 10 ? '0' : ''}${value.hour}:${value.minute < 10 ? '0' : ''}${value.minute}';
+                                      setState(() {
+                                        _bloc.selectedFactTime = value;
+                                        timeFieldController.text =
+                                            '${value.hour < 10 ? '0' : ''}${value.hour}:${value.minute < 10 ? '0' : ''}${value.minute}';
+                                      });
                                     }
                                   });
                                 },
                                 validator: (String value) {
-//                              if (releaseDate == null) {
-//                                return 'Укажите дату события';
-//                              }
                                   return null;
                                 },
                               ),
@@ -312,7 +304,7 @@ class _StatusScreenState extends State<StatusScreen> {
                         height: 16,
                       ),
                       Text(
-                        'Комментарий к статусу',
+                        'Комментарий к статусу:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
@@ -320,26 +312,22 @@ class _StatusScreenState extends State<StatusScreen> {
                       ),
                       TextFormField(
                         autofocus: false,
-                        maxLines: 5,
+                        maxLines: 4,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(8),
-//                            filled: true,
-//                            fillColor: Colors.black12,
+                            filled: _bloc.inputedComments.isEmpty,
+                            fillColor: _fillColor,
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(8)))),
                         controller: commentFieldController,
-//                            focusNode: releaseDateFocusNode,
                         onFieldSubmitted: (String value) {
-                          _bloc.inputedComments = value;
-//                          FocusScope.of(context)
-//                              .requestFocus(stateNumberFocusNode);
+                          setState(() {
+                            _bloc.inputedComments = value;
+                          });
                         },
                         validator: (String value) {
-//                              if (releaseDate == null) {
-//                                return 'Укажите дату события';
-//                              }
                           return null;
                         },
                       ),
@@ -354,7 +342,27 @@ class _StatusScreenState extends State<StatusScreen> {
                           ),
                           color: Theme.of(context).primaryColor,
                           onPressed: () {
-                            _bloc.onTapAddButton();
+                            if (_formKey.currentState.validate()) {
+                              _bloc.onTapAddButton();
+                            } else {
+                              _scaffoldKey.currentState.showSnackBar(SnackBar(
+
+                                content: Container(
+                                  width: 100,
+                                  child: Text(
+                                    'Заполните обязательные поля',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        /*color: Theme.of(context).errorColor*/),
+                                  ),
+                                ),
+                                duration: Duration(seconds: 1),
+                                behavior: SnackBarBehavior.fixed,
+//                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+//                                backgroundColor:
+//                                    Theme.of(context).primaryColorDark,
+                              ));
+                            }
                           },
                         ),
                       )

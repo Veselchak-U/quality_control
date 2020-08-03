@@ -4,7 +4,11 @@ import 'package:quality_control/bloc/common/i_bloc.dart';
 import 'package:quality_control/data/repository.dart';
 import 'package:quality_control/di/screen_builder.dart';
 import 'package:quality_control/entity/app_state.dart';
+import 'package:quality_control/entity/event.dart';
+import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/request.dart';
+import 'package:quality_control/entity/work_interval.dart';
+import 'package:quality_control/extension/datetime_extension.dart';
 
 class QualityBloc extends IBloc {
   QualityBloc(
@@ -13,14 +17,34 @@ class QualityBloc extends IBloc {
       @required AppState appState})
       : _repository = repository,
         _screenBuilder = screenBuilder,
-        currentRequest =
+        request =
             repository.getRequestById(requestId: appState.requestId) {
+    intervalDates = request.getDatesFromIntervals();
+    selectedDate = DateTime.now().trunc();
+    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+    selectedInterval = intervalsByDate[0];
+    ratingReferences = _repository.ratingReferences;
+    presetComments = [];
+    isPresetCommentRequared = false;
+    selectedPresetComment = null;
+    inputedComments = '';
     _log.i('create');
   }
 
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
-  final Request currentRequest;
+  final Request request;
+  List<DateTime> intervalDates; // даты из интервалов по заявке
+  List<WorkInterval> intervalsByDate; // интервалы по текущей дате
+  DateTime selectedDate;
+  WorkInterval selectedInterval;
+  List<Rating> ratingReferences;
+  Rating selectedRating;
+  List<String> presetComments;
+  bool isPresetCommentRequared;
+  String selectedPresetComment;
+  String inputedComments;
+
   final int bottomNavigationBarIndex = 3;
   BuildContext context;
   final FimberLog _log = FimberLog('QualityBloc');
@@ -49,8 +73,46 @@ class QualityBloc extends IBloc {
     }
   }
 
+  void updateIntervalList({DateTime date}) {
+    selectedDate = date;
+    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+    selectedInterval = intervalsByDate[0];
+    _log.i('updateIntervalList currentDate = $selectedDate');
+  }
+
+  void onSelectRating(double value) {
+    if (value == 0.0) {
+      selectedRating = null;
+      presetComments = [];
+      isPresetCommentRequared = false;
+    } else {
+      selectedRating = ratingReferences[value.toInt() - 1];
+      presetComments = selectedRating.presetComments ?? [];
+      isPresetCommentRequared = selectedRating.isCommentRequired ?? false;
+    }
+    selectedPresetComment = null;
+    _log.i('onSelectRating = ${selectedRating?.name}');
+  }
+
+  void onTapAddButton() {
+    var event = Event(
+        systemDate: DateTime.now(),
+        user: _repository.appState.user,
+        dateRequest: selectedDate,
+        intervalRequest: selectedInterval,
+        eventType: EventType.SET_RATING,
+        ratingLabel: selectedRating.label,
+        ratingComment: selectedPresetComment,
+        comment: inputedComments);
+    _repository.addEvent(requestId: request.id, event: event);
+
+    Navigator.pop(context);
+  }
+
   @override
   void dispose() {
     _log.i('dispose');
   }
+
+
 }

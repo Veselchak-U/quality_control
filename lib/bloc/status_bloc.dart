@@ -23,6 +23,7 @@ class StatusBloc extends IBloc {
     intervalsByDate = request.getIntervalsByDate(date: selectedDate);
     selectedInterval = intervalsByDate[0];
     statusReferences = _repository.statusReferences;
+    inputedComments = '';
     _log.i('create');
   }
 
@@ -75,10 +76,15 @@ class StatusBloc extends IBloc {
   }
 
   void onTapAddButton() {
+    DateTime userDate;
+    if (selectedFactDate != null && selectedFactTime != null) {
+      userDate = selectedFactDate.trunc().add(Duration(
+          hours: selectedFactTime.hour, minutes: selectedFactTime.minute));
+    }
+
     var event = Event(
         systemDate: DateTime.now(),
-        userDate: selectedFactDate.trunc().add(Duration(
-            hours: selectedFactTime.hour, minutes: selectedFactTime.minute)),
+        userDate: userDate,
         user: _repository.appState.user,
         dateRequest: selectedDate,
         intervalRequest: selectedInterval,
@@ -86,10 +92,13 @@ class StatusBloc extends IBloc {
         statusLabel: selectedStatus.label,
         comment: inputedComments);
     _repository.addEvent(requestId: request.id, event: event);
+
+    Navigator.pop(context);
   }
 
   @override
   void dispose() {
     _log.i('dispose');
   }
+
 }
