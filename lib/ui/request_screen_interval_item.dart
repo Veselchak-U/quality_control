@@ -39,7 +39,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
                   Spacer(),
                   Padding(
                       padding: EdgeInsets.only(right: 8),
-                      child: Text(item.interval.dateBegin.toStringForHuman())),
+                      child: Text(item.interval.dateBegin.dateForHuman())),
                   Text(
                     item.intervalTimes(),
                     style: TextStyle(fontWeight: FontWeight.bold),

@@ -1,9 +1,15 @@
+import 'package:intl/intl.dart';
+
 extension DateTimeExtension on DateTime {
   String toStringForJson() {
     return '$year${_withLeadZero(month)}${_withLeadZero(day)}';
   }
 
-  String toStringForHuman() {
+  String formatDate(String pattern) {
+    return DateFormat(pattern).format(this);
+  }
+
+  String dateForHuman() {
     String result; // sample = '01.02.2020'
     if (this == null) {
       result = null;
@@ -13,6 +19,16 @@ extension DateTimeExtension on DateTime {
     return result;
   }
 
+  String dateTimeForHuman() {
+    String result; // sample = '01.02.20 19:09'
+    if (this == null) {
+      result = null;
+    } else {
+      result =
+          '${_withLeadZero(day)}.${_withLeadZero(month)}.$year ${_withLeadZero(hour)}:${_withLeadZero(minute)}';
+    }
+    return result;
+  }
 
   DateTime trunc() {
     DateTime result;
@@ -29,5 +45,4 @@ extension DateTimeExtension on DateTime {
     }
     return result;
   }
-
 }

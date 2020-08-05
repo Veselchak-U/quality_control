@@ -74,7 +74,7 @@ class _InfoScreenState extends State<InfoScreen> {
               Padding(
                   padding: EdgeInsets.only(left: 16),
                   child: Text(
-                      '${_request.dateFrom.toStringForHuman()} - ${_request.dateTo.toStringForHuman()}')),
+                      '${_request.dateFrom.dateForHuman()} - ${_request.dateTo.dateForHuman()}')),
               SizedBox(
                 height: 8,
               ),

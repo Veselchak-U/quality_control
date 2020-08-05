@@ -9,16 +9,16 @@ import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
+import 'package:quality_control/service/stream_service.dart';
 
 class QualityBloc extends IBloc {
   QualityBloc(
       {@required Repository repository,
-      @required ScreenBuilder screenBuilder,
-      @required AppState appState})
+      @required ScreenBuilder screenBuilder})
       : _repository = repository,
-        _screenBuilder = screenBuilder,
-        request =
-            repository.getRequestById(requestId: appState.requestId) {
+        _screenBuilder = screenBuilder {
+    _appState = _repository.appState;
+    request = repository.getRequestById(requestId: _appState.requestId);
     intervalDates = request.getDatesFromIntervals();
     selectedDate = DateTime.now().trunc();
     intervalsByDate = request.getIntervalsByDate(date: selectedDate);
@@ -28,12 +28,13 @@ class QualityBloc extends IBloc {
     isPresetCommentRequared = false;
     selectedPresetComment = null;
     inputedComments = '';
+
     _log.i('create');
   }
 
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
-  final Request request;
+  Request request;
   List<DateTime> intervalDates; // даты из интервалов по заявке
   List<WorkInterval> intervalsByDate; // интервалы по текущей дате
   DateTime selectedDate;
@@ -44,6 +45,7 @@ class QualityBloc extends IBloc {
   bool isPresetCommentRequared;
   String selectedPresetComment;
   String inputedComments;
+  AppState _appState;
 
   final int bottomNavigationBarIndex = 3;
   BuildContext context;
@@ -68,7 +70,7 @@ class QualityBloc extends IBloc {
           context,
           PageRouteBuilder<Widget>(
               pageBuilder: (BuildContext context, Animation<double> animation,
-                  Animation<double> secondaryAnimation) =>
+                      Animation<double> secondaryAnimation) =>
                   nextScreen()));
     }
   }
@@ -97,7 +99,7 @@ class QualityBloc extends IBloc {
   void onTapAddButton() {
     var event = Event(
         systemDate: DateTime.now(),
-        user: _repository.appState.user,
+        user: _appState.user,
         dateRequest: selectedDate,
         intervalRequest: selectedInterval,
         eventType: EventType.SET_RATING,
@@ -106,13 +108,12 @@ class QualityBloc extends IBloc {
         comment: inputedComments);
     _repository.addEvent(requestId: request.id, event: event);
 
-    Navigator.pop(context);
+    onTapBottomNavigationBar(1);
+    //    Navigator.pop(context);
   }
 
   @override
   void dispose() {
     _log.i('dispose');
   }
-
-
 }

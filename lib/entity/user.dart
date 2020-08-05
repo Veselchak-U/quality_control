@@ -52,9 +52,9 @@ class User {
     if (userRole == UserRole.DRIVER) {
       result = 'Водитель';
     } else if (userRole == UserRole.DELEGAT) {
-      result = 'Представитель заказчика';
+      result = 'Представитель';
     } else if (userRole == UserRole.OTHER) {
-      result = 'Ответственный по заявке';
+      result = 'Ответственный';
     }
     return result;
   }

@@ -17,12 +17,15 @@ class RequestBloc extends IBloc {
       : _streamService = streamService,
         _repository = repository,
         _screenBuilder = screenBuilder {
-    outRequestsItems = streamService.listRequestItems.stream;
-    outRequestIntervalItems = streamService.listRequestIntervalItems.stream;
+    outRequestsItems = streamService.requestItemsStream.stream;
+//    outRequestsItems.listen(_debugListenRequestsItems);
+    outRequestIntervalItems = streamService.requestIntervalItemsStream.stream;
     currentListPresentation = ListPresentation.INTERVAL;
     currentFilterByDate = streamService.requestFilterByDate;
     currentFilterByText = streamService.requestFilterByText;
     isSearchMode = currentFilterByText.isNotEmpty;
+    _appState = _repository.appState;
+//    streamService.appState.listen((AppState value) { _appState = value; });
     _log.i('create');
   }
 
@@ -36,12 +39,18 @@ class RequestBloc extends IBloc {
   FilterByDate currentFilterByDate;
   String currentFilterByText;
   bool isSearchMode;
+  AppState _appState;
 
   BuildContext context;
   final FimberLog _log = FimberLog('RequestBloc');
 
   bool get isRequestPresentation =>
       currentListPresentation == ListPresentation.REQUEST;
+
+//  void _debugListenRequestsItems(List<Request> inRequests) {
+//    print('ku');
+//  }
+
 
   void changeListPresentation() {
     if (currentListPresentation == ListPresentation.INTERVAL) {
@@ -84,8 +93,9 @@ class RequestBloc extends IBloc {
     _log.d('onTapListItem requestId = $requestId, intervalId = $intervalId');
     _repository.setAppState(
         newAppState: AppState(requestId: requestId, intervalId: intervalId));
+    _streamService.refreshDataEventsStream.add(RefreshDataEvent.REFRESH_REQUESTS);
 
-    var index = _repository.appState.bottomNavigationBarIndex;
+    var index = _appState.bottomNavigationBarIndex;
     Widget Function() nextScreen;
     if (index == 0) {
       nextScreen = _screenBuilder.getInfoScreenBuilder();
@@ -106,4 +116,5 @@ class RequestBloc extends IBloc {
   void dispose() {
     _log.i('dispose');
   }
+
 }

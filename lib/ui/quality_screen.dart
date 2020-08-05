@@ -108,7 +108,7 @@ class _QualityScreenState extends State<QualityScreen> {
                                     child: Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          e.toStringForHuman(),
+                                          e.dateForHuman(),
                                         )),
                                     value: e))
                                 .toList(),

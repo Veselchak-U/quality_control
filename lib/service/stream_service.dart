@@ -1,6 +1,7 @@
 import 'package:fimber/fimber.dart';
 import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/entity/event.dart';
+import 'package:quality_control/entity/event_item.dart';
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/request_interval_item.dart';
@@ -9,39 +10,34 @@ import 'package:quality_control/extension/datetime_extension.dart';
 
 class StreamService {
   StreamService() {
-    _requestFilterByDate = FilterByDate.TODAY;
-    _requestFilterByText = '';
-    listRequests.map(_filterRequests).listen(listRequestItems.add);
-    listRequests
-        .map(_convertRequestToRequestIntervalItem)
-        .map(_filterRequestsIntervalItem)
-        .listen(listRequestIntervalItems.add);
+    initialize();
     _log.i('create');
   }
 
   // Текущее состояние приложения
-  final BehaviorSubject<AppState> appState =
-      BehaviorSubject<AppState>();
+  final BehaviorSubject<AppState> appStateStream = BehaviorSubject<AppState>();
 
   // Заявки - входящий поток
-  final BehaviorSubject<List<Request>> listRequests =
+  final BehaviorSubject<List<Request>> requestsStream =
       BehaviorSubject<List<Request>>();
 
   // Элементы списка: заявки
-  final BehaviorSubject<List<Request>> listRequestItems =
+  final BehaviorSubject<List<Request>> requestItemsStream =
       BehaviorSubject<List<Request>>();
 
   // Элементы списка: интервалы заявок
-  final BehaviorSubject<List<RequestIntervalItem>> listRequestIntervalItems =
+  final BehaviorSubject<List<RequestIntervalItem>> requestIntervalItemsStream =
       BehaviorSubject<List<RequestIntervalItem>>();
 
   // Элементы списка: события по заявке
-  final BehaviorSubject<List<Event>> listEvents =
-      BehaviorSubject<List<Event>>();
+  final BehaviorSubject<List<EventItem>> eventItemsStream =
+      BehaviorSubject<List<EventItem>>();
 
   // События о необходимости обновления данных
-  final PublishSubject<RefreshDataEvent> refreshData =
+  final PublishSubject<RefreshDataEvent> refreshDataEventsStream =
       PublishSubject<RefreshDataEvent>();
+
+  AppState _appState;
 
   final FimberLog _log = FimberLog('StreamService');
 
@@ -52,7 +48,7 @@ class StreamService {
 
   set requestFilterByDate(FilterByDate value) {
     _requestFilterByDate = value;
-    refreshData.add(RefreshDataEvent.REFRESH_REQUESTS);
+    refreshDataEventsStream.add(RefreshDataEvent.REFRESH_REQUESTS);
   }
 
   // фильтр заявок по-умолчанию (текст)
@@ -62,7 +58,76 @@ class StreamService {
 
   set requestFilterByText(String value) {
     _requestFilterByText = value;
-    refreshData.add(RefreshDataEvent.REFRESH_REQUESTS);
+    refreshDataEventsStream.add(RefreshDataEvent.REFRESH_REQUESTS);
+  }
+
+  bool initialize() {
+    _log.d('initialize() start');
+
+    _requestFilterByDate = FilterByDate.TODAY;
+    _requestFilterByText = '';
+
+    requestsStream.map(_filterRequests).listen(requestItemsStream.add);
+    requestsStream
+        .map(_convertRequestToRequestIntervalItem)
+        .map(_filterRequestsIntervalItem)
+        .listen(requestIntervalItemsStream.add);
+    requestsStream.map(_getCurrentEventItems).listen(eventItemsStream.add);
+
+    appStateStream.listen((AppState value) {
+      _appState = value;
+    });
+
+    _log.d('initialize() end');
+    return true;
+  }
+
+  List<EventItem> _getCurrentEventItems(List<Request> requests) {
+    List<EventItem> result = [];
+    var currentRequestId = _appState?.requestId;
+    if (currentRequestId != null) {
+      var index = requests.indexWhere((Request r) => r.id == currentRequestId);
+      if (index != -1) {
+        var events = requests[index].events;
+        if (events != null) {
+          // DATE_LABEL
+          var currentDate = events[0].systemDate.trunc();
+          result.add(_getDateLabelEvent(date: currentDate));
+
+          events.forEach((Event e) {
+            // DATE_LABEL
+            var nextDate = e.systemDate.trunc();
+            if (nextDate != currentDate) {
+              currentDate = nextDate;
+              result.add(_getDateLabelEvent(date: currentDate));
+            }
+            // EVENT
+            var eventItem = EventItem(
+                type: EventItemType.EVENT,
+                event: e,
+                isAlien: _isAlienEvent(event: e));
+            result.add(eventItem);
+          });
+        }
+      }
+    }
+    return result;
+  }
+
+  bool _isAlienEvent({Event event}) {
+    bool result;
+    var currentUserId = _appState.user.id;
+    if (event.user.id == currentUserId) {
+      result = false;
+    } else {
+      result = true;
+    }
+    return result;
+  }
+
+  EventItem _getDateLabelEvent({DateTime date}) {
+    return EventItem(
+        type: EventItemType.DATE_LABEL, labelText: date.dateForHuman());
   }
 
   List<Request> _filterRequests(List<Request> inRequests) {
@@ -80,8 +145,8 @@ class StreamService {
       });
     } else if (_requestFilterByDate == FilterByDate.BEFORE) {
       inRequests.forEach((Request request) {
-        var index = request.intervals
-            .indexWhere((WorkInterval i) => i.dateBegin.trunc().isBefore(today));
+        var index = request.intervals.indexWhere(
+            (WorkInterval i) => i.dateBegin.trunc().isBefore(today));
         if (index != -1) {
           filteredByDate.add(request);
         }
@@ -106,7 +171,7 @@ class StreamService {
       var d = String.fromCharCode(0); // delimiter
       filteredByDate.forEach((Request r) {
         var data1 =
-            '${r.number}$d${r.dateFrom.toStringForHuman()}$d${r.dateTo.toStringForHuman()}$d${r.allIntervalsToString()}$d';
+            '${r.number}$d${r.dateFrom.dateForHuman()}$d${r.dateTo.dateForHuman()}$d${r.allIntervalsToString()}$d';
         var data2 = '${r.routeFrom}$d${r.routeTo}$d';
         var data3 =
             '${r.customer}$d${r.customerDelegat.lastName}$d${r.customerDelegat.firstName}$d${r.customerDelegat.middleName}$d';
@@ -178,7 +243,7 @@ class StreamService {
       var d = String.fromCharCode(0); // delimiter
       filteredByDate.forEach((RequestIntervalItem i) {
         var data1 =
-            '${i.number}$d${i.interval.dateBegin.toStringForHuman()}$d${i.intervalTimes()}$d';
+            '${i.number}$d${i.interval.dateBegin.dateForHuman()}$d${i.intervalTimes()}$d';
         var data2 = '${i.routeFrom}$d${i.routeTo}$d';
         var data3 =
             '${i.customer}$d${i.customerDelegat.lastName}$d${i.customerDelegat.firstName}$d${i.customerDelegat.middleName}$d';
@@ -193,11 +258,11 @@ class StreamService {
   }
 
   void dispose() {
-    listRequests.close();
-    listRequestItems.close();
-    listRequestIntervalItems.close();
-    listEvents.close();
-    refreshData.close();
+    requestsStream.close();
+    requestItemsStream.close();
+    requestIntervalItemsStream.close();
+    eventItemsStream.close();
+    refreshDataEventsStream.close();
     _log.i('dispose');
   }
 }

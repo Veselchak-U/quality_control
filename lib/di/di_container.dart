@@ -95,8 +95,7 @@ class DiContainer {
               child: InfoScreen(),
               bloc: InfoBloc(
                   repository: i.get<Repository>(),
-                  screenBuilder: i.get<ScreenBuilder>(),
-                  appState: i.get<AppState>()),
+                  screenBuilder: i.get<ScreenBuilder>()),
             ),
         isSingleton: true);
 
@@ -107,7 +106,7 @@ class DiContainer {
               bloc: HistoryBloc(
                   repository: i.get<Repository>(),
                   screenBuilder: i.get<ScreenBuilder>(),
-                  appState: i.get<AppState>()),
+                  streamService: i.get<StreamService>()),
             ),
         isSingleton: true);
 
@@ -117,8 +116,7 @@ class DiContainer {
               child: StatusScreen(),
               bloc: StatusBloc(
                   repository: i.get<Repository>(),
-                  screenBuilder: i.get<ScreenBuilder>(),
-                  appState: i.get<AppState>()),
+                  screenBuilder: i.get<ScreenBuilder>()),
             ),
         isSingleton: true);
 
@@ -128,8 +126,7 @@ class DiContainer {
               child: QualityScreen(),
               bloc: QualityBloc(
                   repository: i.get<Repository>(),
-                  screenBuilder: i.get<ScreenBuilder>(),
-                  appState: i.get<AppState>()),
+                  screenBuilder: i.get<ScreenBuilder>()),
             ),
         isSingleton: true);
   }

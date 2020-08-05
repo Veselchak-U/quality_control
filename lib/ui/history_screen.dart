@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/history_bloc.dart';
+import 'package:quality_control/entity/event_item.dart';
+import 'package:quality_control/ui/history_screen_item.dart';
 
 class HistoryScreen extends StatefulWidget {
   @override
@@ -55,13 +57,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
           textAlign: TextAlign.center,
         ),
       ),
-      body: Container(
-          color: Colors.white,
-          child: Center(
-              child: Text(
-            'HistoryScreen',
-            style: TextStyle(fontSize: 24, color: Colors.black38),
-          ))),
+      body: StreamBuilder(
+        stream: _bloc.outEventItems,
+        builder: (BuildContext context, AsyncSnapshot<List<EventItem>> snapshot) {
+          if (snapshot.data == null || snapshot.data.isEmpty) {
+            return Center(
+                child: Text(
+                  'Событий нет',
+                  style: TextStyle(fontSize: 20, color: Colors.black38),
+                ));
+          } else {
+            return Scrollbar(
+              child: ListView.builder(
+                padding: EdgeInsets.all(0),
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) =>
+                    HistoryScreenItem(snapshot.data[index], _bloc),
+              ),
+            );
+          }
+        },
+      ),
       bottomNavigationBar: bottomNavigationBar,
     );
   }

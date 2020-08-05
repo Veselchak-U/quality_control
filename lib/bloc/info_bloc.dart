@@ -9,18 +9,19 @@ import 'package:url_launcher/url_launcher.dart';
 
 class InfoBloc extends IBloc {
   InfoBloc(
-      {@required Repository repository,
-      @required ScreenBuilder screenBuilder,
-      @required AppState appState})
+      {@required Repository repository, @required ScreenBuilder screenBuilder})
       : _repository = repository,
-        _screenBuilder = screenBuilder,
-        request = repository.getRequestById(requestId: appState.requestId) {
+        _screenBuilder = screenBuilder {
+    _appState = _repository.appState;
+    request = repository.getRequestById(requestId: _appState.requestId);
     _log.i('create');
   }
 
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
-  final Request request;
+  Request request;
+  AppState _appState;
+
   final int bottomNavigationBarIndex = 0;
   BuildContext context;
   final FimberLog _log = FimberLog('InfoBloc');

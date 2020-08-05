@@ -39,7 +39,7 @@ class RequestScreenItem extends StatelessWidget {
                   Padding(
                       padding: EdgeInsets.only(right: 8),
                       child: Text(
-                        '${request.dateFrom.toStringForHuman()} - ${request.dateTo.toStringForHuman()}',
+                        '${request.dateFrom.dateForHuman()} - ${request.dateTo.dateForHuman()}',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       )),
                 ],

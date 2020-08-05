@@ -103,7 +103,7 @@ class _StatusScreenState extends State<StatusScreen> {
                                     child: Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          e.toStringForHuman(),
+                                          e.dateForHuman(),
                                         )),
                                     value: e))
                                 .toList(),
@@ -248,7 +248,7 @@ class _StatusScreenState extends State<StatusScreen> {
                                       setState(() {
                                         _bloc.selectedFactDate = value;
                                         dateFieldController.text =
-                                            value.toStringForHuman();
+                                            value.dateForHuman();
                                       });
                                     }
                                   });

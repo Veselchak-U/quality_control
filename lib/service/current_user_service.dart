@@ -17,7 +17,7 @@ class CurrentUserService {
     _currentUser ??= User(
         id: '1',
         userRole: UserRole.DRIVER,
-        lastName: 'Водитель',
+        lastName: 'Иванов',
         firstName: 'Иван',
         middleName: 'Иванович',
         phone: '+790500001234');

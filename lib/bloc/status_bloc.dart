@@ -13,11 +13,11 @@ import 'package:quality_control/extension/datetime_extension.dart';
 class StatusBloc extends IBloc {
   StatusBloc(
       {@required Repository repository,
-      @required ScreenBuilder screenBuilder,
-      @required AppState appState})
+      @required ScreenBuilder screenBuilder})
       : _repository = repository,
-        _screenBuilder = screenBuilder,
-        request = repository.getRequestById(requestId: appState.requestId) {
+        _screenBuilder = screenBuilder {
+    _appState = _repository.appState;
+    request = repository.getRequestById(requestId: _appState.requestId);
     intervalDates = request.getDatesFromIntervals();
     selectedDate = DateTime.now().trunc();
     intervalsByDate = request.getIntervalsByDate(date: selectedDate);
@@ -29,7 +29,7 @@ class StatusBloc extends IBloc {
 
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
-  final Request request; // заявка
+  Request request; // заявка
   List<DateTime> intervalDates; // даты из интервалов по заявке
   List<WorkInterval> intervalsByDate; // интервалы по текущей дате
   DateTime selectedDate;
@@ -39,6 +39,7 @@ class StatusBloc extends IBloc {
   DateTime selectedFactDate;
   TimeOfDay selectedFactTime;
   String inputedComments;
+  AppState _appState;
 
   final int bottomNavigationBarIndex = 2;
   BuildContext context;
@@ -93,12 +94,12 @@ class StatusBloc extends IBloc {
         comment: inputedComments);
     _repository.addEvent(requestId: request.id, event: event);
 
-    Navigator.pop(context);
+    onTapBottomNavigationBar(1);
+    //    Navigator.pop(context);
   }
 
   @override
   void dispose() {
     _log.i('dispose');
   }
-
 }

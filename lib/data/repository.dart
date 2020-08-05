@@ -19,7 +19,7 @@ class Repository {
         _streamService = streamService,
         _appState = appState {
     // входящие события о небходимости обновить данные
-    streamService.refreshData.listen(_onRefreshDataEvent);
+    streamService.refreshDataEventsStream.listen(_onRefreshDataEvent);
     _log.i('create');
   }
 
@@ -44,16 +44,17 @@ class Repository {
         await _dataSource.getRatingReferences(user: _currentUser);
     _requests = await _dataSource.loadRequests(user: _currentUser);
 
-    // Инициализируем текущее состояние
+    // Инициализируем текущее состояние приложения
     setAppState(
         newAppState: AppState(
             requestFilterByDate: RequestFilterByDate.TODAY,
             requestFilterByText: '',
             user: _currentUser,
             bottomNavigationBarIndex: 0));
+    _streamService.appStateStream.add(_appState);
 
     // Рассылаем зачитанные данные
-    _streamService.listRequests.add(_requests);
+    _streamService.requestsStream.add(_requests);
     _log.d('listRequests.add ${_requests.length} items');
 
     _log.d('initialize() end');
@@ -89,16 +90,16 @@ class Repository {
       _appState.bottomNavigationBarIndex = newAppState.bottomNavigationBarIndex;
     }
     // refresh data
-    _streamService.appState.add(_appState);
+    _streamService.appStateStream.add(_appState);
     if (needRefreshData) {
-      _streamService.listRequests.add(_requests);
+      _onRefreshDataEvent(RefreshDataEvent.REFRESH_REQUESTS);
     }
   }
 
   // обработчик входящих событий о небходимости обновить данные
   void _onRefreshDataEvent(RefreshDataEvent event) {
     if (event == RefreshDataEvent.REFRESH_REQUESTS) {
-      _streamService.listRequests.add(_requests);
+      _streamService.requestsStream.add(_requests);
     }
   }
 
@@ -126,6 +127,6 @@ class Repository {
     var request = getRequestById(requestId: requestId);
     request.events ??= [];
     request.events.add(event);
-    _streamService.listRequests.add(_requests);
+    _onRefreshDataEvent(RefreshDataEvent.REFRESH_REQUESTS);
   }
 }
