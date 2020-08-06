@@ -28,7 +28,7 @@ class ReferenceBooks {
           'Опоздание заказчика более 2-ух часов'
         ],
         isCommentRequired: true,
-        isCanChange: true),
+        isCanUpdate: true),
     Rating(
         label: '2',
         name: 'Плохо',
@@ -37,7 +37,7 @@ class ReferenceBooks {
           'Опоздание заказчика более часа'
         ],
         isCommentRequired: true,
-        isCanChange: true),
+        isCanUpdate: true),
     Rating(
         label: '3',
         name: 'Удовлетворительно',
@@ -46,13 +46,13 @@ class ReferenceBooks {
           'Опоздание заказчика менее получаса'
         ],
         isCommentRequired: true,
-        isCanChange: false),
+        isCanUpdate: false),
     Rating(
         label: '4',
         name: 'Хорошо',
         presetComments: [],
         isCommentRequired: false,
-        isCanChange: true),
+        isCanUpdate: true),
     Rating(
         label: '5',
         name: 'Очень хорошо',
@@ -63,15 +63,17 @@ class ReferenceBooks {
           'Всё вышеперечисленное'
         ],
         isCommentRequired: false,
-        isCanChange: true)
+        isCanUpdate: true)
   ];
 
   static List<Request> getRequests() {
-    var now = DateTime.now().trunc();
+    var now = DateTime.now();
+    var today = DateTime.now().trunc();
+    var yesterday = now.subtract(Duration(days: 1));
     var idCounter = 1;
 
-    var dateFrom = now.subtract(Duration(days: 12));
-    var dateTo = now.add(Duration(days: 1));
+    var dateFrom = today.subtract(Duration(days: 12));
+    var dateTo = today.add(Duration(days: 1));
     var daysInPeriod = dateTo.difference(dateFrom).inDays + 1;
     var currentDay = dateFrom.day;
     var request1 = Request(
@@ -130,9 +132,10 @@ class ReferenceBooks {
           '1-я половина 29984\nРежим согласован с ЦУТ\n\n№ С302-670-31-01-670-31/1636 от 20.02.2019\n\nкорректирование режима согласно С302-670-31-01-670-31/3908 от 18.04',
       events: [
         Event(
-            systemDate: DateTime.now().subtract(Duration(days: 1)),
-            userDate: DateTime.now()
-                .subtract(Duration(days: 1, minutes: Random().nextInt(30))),
+            id: '${idCounter++}',
+            systemDate: yesterday,
+            userDate: yesterday
+                .subtract(Duration(minutes: Random().nextInt(30))),
             user: User(
                 id: '11',
                 userRole: UserRole.DELEGAT,
@@ -140,16 +143,23 @@ class ReferenceBooks {
                 firstName: 'Петр',
                 middleName: 'Петрович',
                 phone: '+79991111001'),
-            dateRequest: DateTime.now(),
+            dateRequest: yesterday,
             intervalRequest: WorkInterval(
-                id: '333', dateBegin: DateTime.now(), dateEnd: DateTime.now()),
+                id: '333',
+                dateBegin: yesterday
+                    .trunc()
+                    .add(Duration(hours: 7, minutes: 25)),
+                dateEnd: yesterday
+                    .trunc()
+                    .add(Duration(hours: 8))),
             eventType: EventType.SET_STATUS,
             statusLabel: 'START',
             comment: 'Коммент к статусу'),
         Event(
-            systemDate: DateTime.now().subtract(Duration(days: 1)),
-            userDate: DateTime.now()
-                .subtract(Duration(days: 1, minutes: Random().nextInt(30))),
+            id: '${idCounter++}',
+            systemDate: yesterday,
+            userDate: yesterday
+                .subtract(Duration(minutes: Random().nextInt(30))),
             user: User(
                 id: '11',
                 userRole: UserRole.DELEGAT,
@@ -157,9 +167,15 @@ class ReferenceBooks {
                 firstName: 'Петр',
                 middleName: 'Петрович',
                 phone: '+79991111001'),
-            dateRequest: DateTime.now(),
+            dateRequest: yesterday,
             intervalRequest: WorkInterval(
-                id: '333', dateBegin: DateTime.now(), dateEnd: DateTime.now()),
+                id: '333',
+                dateBegin: yesterday
+                    .trunc()
+                    .add(Duration(hours: 12, minutes: 30)),
+                dateEnd: yesterday
+                    .trunc()
+                    .add(Duration(hours: 12, minutes: 40))),
             eventType: EventType.SET_RATING,
             ratingLabel: '5',
             ratingComment: 'Аккуратно',
@@ -167,8 +183,8 @@ class ReferenceBooks {
       ],
     );
 
-    dateFrom = DateTime(now.year, now.month, 1);
-    dateTo = DateTime(now.year, now.month + 1, 0);
+    dateFrom = DateTime(today.year, today.month, 1);
+    dateTo = DateTime(today.year, today.month + 1, 0);
     daysInPeriod = dateTo.difference(dateFrom).inDays + 1;
     currentDay = dateFrom.day;
     var request2 = Request(
@@ -182,13 +198,13 @@ class ReferenceBooks {
         if (i % 2 == 1) {
           result = WorkInterval(
               id: '${idCounter++}',
-              dateBegin: DateTime(now.year, now.month, currentDay, 15, 00),
-              dateEnd: DateTime(now.year, now.month, currentDay, 16, 00));
+              dateBegin: DateTime(today.year, today.month, currentDay, 15, 00),
+              dateEnd: DateTime(today.year, today.month, currentDay, 16, 00));
         } else if (i % 2 == 0) {
           result = WorkInterval(
               id: '${idCounter++}',
-              dateBegin: DateTime(now.year, now.month, currentDay, 16, 30),
-              dateEnd: DateTime(now.year, now.month, currentDay, 17, 00));
+              dateBegin: DateTime(today.year, today.month, currentDay, 16, 30),
+              dateEnd: DateTime(today.year, today.month, currentDay, 17, 00));
           currentDay++;
         }
         return result;
@@ -209,9 +225,10 @@ class ReferenceBooks {
           'Доставка персонала АУО УМТС: на работу, обед, с работы: Н-город - УМТС(тех.база, нефтебаза, АЗС-1, АЗС-2)',
       events: [
         Event(
-            systemDate: DateTime.now().subtract(Duration(days: 1)),
-            userDate: DateTime.now()
-                .subtract(Duration(days: 1, minutes: Random().nextInt(30))),
+            id: '${idCounter++}',
+            systemDate: yesterday,
+            userDate: yesterday
+                .subtract(Duration(minutes: Random().nextInt(30))),
             user: User(
                 id: '11',
                 userRole: UserRole.DELEGAT,
@@ -219,16 +236,24 @@ class ReferenceBooks {
                 firstName: 'Петр',
                 middleName: 'Петрович',
                 phone: '+79991111001'),
-            dateRequest: DateTime.now(),
+            dateRequest: yesterday,
             intervalRequest: WorkInterval(
-                id: '333', dateBegin: DateTime.now(), dateEnd: DateTime.now()),
+              id: '333',
+              dateBegin: yesterday
+                  .trunc()
+                  .add(Duration(hours: 15)),
+              dateEnd: yesterday
+                  .trunc()
+                  .add(Duration(hours: 16)),
+            ),
             eventType: EventType.SET_STATUS,
             statusLabel: 'START',
             comment: 'Коммент к статусу'),
         Event(
-            systemDate: DateTime.now().subtract(Duration(days: 1)),
-            userDate: DateTime.now()
-                .subtract(Duration(days: 1, minutes: Random().nextInt(30))),
+            id: '${idCounter++}',
+            systemDate: yesterday,
+            userDate: yesterday
+                .subtract(Duration(minutes: Random().nextInt(30))),
             user: User(
                 id: '12',
                 userRole: UserRole.DELEGAT,
@@ -236,9 +261,15 @@ class ReferenceBooks {
                 firstName: 'Сидор',
                 middleName: 'Сидорович',
                 phone: '+799911110002'),
-            dateRequest: DateTime.now(),
+            dateRequest: yesterday,
             intervalRequest: WorkInterval(
-                id: '333', dateBegin: DateTime.now(), dateEnd: DateTime.now()),
+                id: '333',
+                dateBegin: yesterday
+                    .trunc()
+                    .add(Duration(hours: 16, minutes: 30)),
+                dateEnd: yesterday
+                    .trunc()
+                    .add(Duration(hours: 17))),
             eventType: EventType.SET_RATING,
             ratingLabel: '5',
             ratingComment: 'Аккуратно',

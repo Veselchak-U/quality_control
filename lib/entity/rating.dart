@@ -5,11 +5,11 @@ class Rating {
       this.name,
       this.presetComments,
       this.isCommentRequired,
-      this.isCanChange});
+      this.isCanUpdate});
 
   String label;
   String name;
   List<String> presetComments; // список предустановленных комментариев
   bool isCommentRequired; // требуется обязательное указание комментария
-  bool isCanChange; // возможность последующего изменения оценки
+  bool isCanUpdate; // возможность последующего изменения оценки
 }

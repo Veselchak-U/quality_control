@@ -19,5 +19,5 @@ class RequestIntervalItem {
   String customer; // заказчик
   User customerDelegat; // представитель заказчика
 
-  String intervalTimes() => interval.intervalTimes();
+  String intervalTimes() => interval.toString();
 }

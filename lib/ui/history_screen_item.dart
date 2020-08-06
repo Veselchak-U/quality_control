@@ -4,6 +4,7 @@ import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/event_item.dart';
 import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/status.dart';
+import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
 
 class HistoryScreenItem extends StatelessWidget {
@@ -25,9 +26,8 @@ class HistoryScreenItem extends StatelessWidget {
             widthFactor: 0.9,
             child: Container(
               decoration: BoxDecoration(
-                  color: eventItem.isAlien
-                      ? Colors.yellow[100]
-                      : Colors.green[100],
+                  color:
+                      eventItem.isAlien ? Colors.yellow[50] : Colors.green[50],
                   border: Border.all(),
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(8),
@@ -65,6 +65,10 @@ class HistoryScreenItem extends StatelessWidget {
                     SizedBox(
                       height: 8,
                     ),
+                    Text(_getPeriodText(), style: TextStyle(fontSize: 14)),
+                    SizedBox(
+                      height: 8,
+                    ),
                     Text(_getEventText(), style: TextStyle(fontSize: 14)),
                   ],
                 ),
@@ -85,9 +89,30 @@ class HistoryScreenItem extends StatelessWidget {
                       child: Text(eventItem.labelText,
                           style: TextStyle(fontSize: 14))))));
     } else if (eventItem.type == EventItemType.UNREAD_LABEL) {
+      // TODO(dyv): допилить
       result = Text('Метка непрочитано: ${eventItem.labelText}');
     } else {
+      // TODO(dyv): допилить
       result = Text('Неизвестный тип сообщения');
+    }
+    return result;
+  }
+
+  String _getPeriodText() {
+    String result = '';
+    DateTime date = eventItem.event.dateRequest;
+    WorkInterval interval = eventItem.event.intervalRequest;
+
+    if (date == null && interval == null) {
+      result = 'Для всей заявки';
+    } else {
+      if (date != null) {
+        var andInterval =
+            interval == null ? '' : 'и интервала: ${interval.toString()}';
+        result = 'Для даты: ${date.dateForHuman()} $andInterval';
+      } else {
+        result = 'Для интервала: ${interval.toString()}';
+      }
     }
     return result;
   }
@@ -97,38 +122,51 @@ class HistoryScreenItem extends StatelessWidget {
     Event event = eventItem.event;
     EventType eventType = event.eventType;
 
-    var userDate = '';
-    if (event.userDate != null) {
-      userDate = event.userDate.formatDate('dd.MM.yy HH:mm');
-    }
-
     if (eventType == EventType.SET_STATUS) {
+      //
+      // УСТАНОВКА СТАТУСА
+      //
       var statusName = bloc.statuses
           .firstWhere((Status e) => e.label == event.statusLabel)
           .name;
+      var userDate = '';
+      if (event.userDate != null) {
+        userDate =
+            ', факт.время: ${event.userDate.formatDate('dd.MM.yy HH:mm')}';
+      }
       var comment = '';
       if (event.comment != null && event.comment.isNotEmpty) {
-        comment = ', комментарий: "${event.comment}"';
+        comment = ', комментарии: ${event.comment}';
       }
-      result = 'установил статус "$statusName" $userDate$comment';
+      var action = event.parentId == null ? 'установил' : 'изменил';
+      result = '$action статус "$statusName"$userDate$comment';
     } else if (eventType == EventType.SET_RATING) {
+      //
+      // ВЫСТАВЛЕНИЕ ОЦЕНКИ
+      //
       var ratingName = bloc.ratings
           .firstWhere((Rating e) => e.label == event.ratingLabel)
           .name;
       var presetComment = '';
-      if (event.ratingComment != null && event.ratingComment.isNotEmpty) {
-        presetComment = '"${event.ratingComment}"';
+      if (event.ratingComment != null) {
+        presetComment = event.ratingComment;
       }
       var comment = '';
-      if (event.comment != null && event.comment.isNotEmpty) {
-        comment = '"${event.comment}"';
+      if (event.comment != null) {
+        comment = event.comment;
       }
       var unionComment = '';
       if (presetComment.isNotEmpty || comment.isNotEmpty) {
-        unionComment = ', комментарий: $presetComment $comment';
+        if (presetComment.isNotEmpty) {
+          var commentString = comment.isNotEmpty ? ', $comment' : '';
+          unionComment = ', комментарии: $presetComment$commentString';
+        } else {
+          unionComment = ', комментарии: $comment';
+        }
       }
-      result = 'выставил оценку "$ratingName" $userDate$unionComment';
-    } else if (eventType == EventType.UPDATE) {}
+      var action = event.parentId == null ? 'выставил' : 'изменил';
+      result = '$action оценку "$ratingName"$unionComment';
+    }
     return result;
   }
 }

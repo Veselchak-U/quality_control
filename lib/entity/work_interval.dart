@@ -7,7 +7,8 @@ class WorkInterval {
   DateTime dateBegin;
   DateTime dateEnd;
 
-  String intervalTimes() {
+  @override
+  String toString() {
     String result;
     if (this != null) {
       var hh1 = _withLeadZero(dateBegin.hour);

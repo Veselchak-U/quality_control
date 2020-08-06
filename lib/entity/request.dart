@@ -43,7 +43,7 @@ class Request {
     if (intervals != null && intervals.isNotEmpty) {
       Set<String> set = <String>{};
       intervals.forEach((WorkInterval i) {
-        set.add(i.intervalTimes());
+        set.add(i.toString());
       });
       var sortList = set.toList();
       sortList.sort();

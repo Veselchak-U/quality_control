@@ -147,7 +147,7 @@ class _StatusScreenState extends State<StatusScreen> {
                                       DropdownMenuItem<WorkInterval>(
                                           child: Align(
                                               alignment: Alignment.center,
-                                              child: Text(e.intervalTimes())),
+                                              child: Text(e.toString())),
                                           value: e))
                                   .toList(),
                               onChanged: (WorkInterval value) {
