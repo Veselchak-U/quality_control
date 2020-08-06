@@ -9,6 +9,7 @@ import 'package:quality_control/bloc/quality_bloc.dart';
 import 'package:quality_control/bloc/request_bloc.dart';
 import 'package:quality_control/bloc/startup_bloc.dart';
 import 'package:quality_control/bloc/status_bloc.dart';
+import 'package:quality_control/entity/event.dart';
 
 typedef StartupScreenBuilder = BlocProvider<StartupBloc> Function();
 typedef LoginScreenBuilder = BlocProvider<LoginBloc> Function();

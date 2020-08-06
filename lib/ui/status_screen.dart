@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/status_bloc.dart';
+import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/status.dart';
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
@@ -14,17 +15,33 @@ class _StatusScreenState extends State<StatusScreen> {
   StatusBloc _bloc;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 //  final Color _fillColor = Color(0xfff0f0f0);
   final Color _fillColor = Color(0xffe5e5e5);
   var dateFieldController = TextEditingController();
   var timeFieldController = TextEditingController();
   var commentFieldController = TextEditingController();
+  bool isUpdateMode;
+  Event event;
 
   @override
   void initState() {
     super.initState();
     _bloc = BlocProvider.of(context);
     _bloc.context = context;
+    isUpdateMode = _bloc.isUpdateMode;
+    if (isUpdateMode) {
+      event = _bloc.event;
+      dateFieldController.text = _bloc.selectedFactDate.dateForHuman() ?? '';
+      if (_bloc.selectedFactTime != null) {
+        var time = _bloc.selectedFactTime;
+        timeFieldController.text =
+            '${time.hour < 10 ? '0' : ''}${time.hour}:${time.minute < 10 ? '0' : ''}${time.minute}';
+        if (_bloc.inputedComments.isNotEmpty) {
+          commentFieldController.text = _bloc.inputedComments;
+        }
+      }
+    }
   }
 
   @override
@@ -62,7 +79,9 @@ class _StatusScreenState extends State<StatusScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Заявка № ${_bloc.request.number}',
+          isUpdateMode
+              ? 'Корректировка события'
+              : 'Заявка № ${_bloc.request.number}',
           textAlign: TextAlign.center,
         ),
       ),
@@ -108,9 +127,11 @@ class _StatusScreenState extends State<StatusScreen> {
                                     value: e))
                                 .toList(),
                             onChanged: (DateTime value) {
-                              setState(() {
-                                _bloc.updateIntervalList(date: value);
-                              });
+                              if (!isUpdateMode) {
+                                setState(() {
+                                  _bloc.updateIntervalList(date: value);
+                                });
+                              }
                             },
                             validator: (DateTime value) {
                               return null;
@@ -151,9 +172,11 @@ class _StatusScreenState extends State<StatusScreen> {
                                           value: e))
                                   .toList(),
                               onChanged: (WorkInterval value) {
-                                setState(() {
-                                  _bloc.selectedInterval = value;
-                                });
+                                if (!isUpdateMode) {
+                                  setState(() {
+                                    _bloc.selectedInterval = value;
+                                  });
+                                }
                               },
                               validator: (WorkInterval value) {
                                 return null;
@@ -173,6 +196,7 @@ class _StatusScreenState extends State<StatusScreen> {
                         child: FractionallySizedBox(
                             widthFactor: 0.7,
                             child: DropdownButtonFormField<Status>(
+                              value: _bloc.selectedStatus,
                               elevation: 4,
                               isExpanded: true,
                               decoration: InputDecoration(
@@ -337,7 +361,7 @@ class _StatusScreenState extends State<StatusScreen> {
                       Center(
                         child: MaterialButton(
                           child: Text(
-                            'Добавить',
+                            isUpdateMode ? 'Корректировать' : 'Добавить',
                             style: TextStyle(color: Colors.white),
                           ),
                           color: Theme.of(context).primaryColor,
@@ -346,7 +370,6 @@ class _StatusScreenState extends State<StatusScreen> {
                               _bloc.onTapAddButton();
                             } else {
                               _scaffoldKey.currentState.showSnackBar(SnackBar(
-
                                 content: Container(
                                   width: 100,
                                   child: Text(

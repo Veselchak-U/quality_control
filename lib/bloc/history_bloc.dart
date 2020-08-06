@@ -4,6 +4,7 @@ import 'package:quality_control/bloc/common/i_bloc.dart';
 import 'package:quality_control/data/repository.dart';
 import 'package:quality_control/di/screen_builder.dart';
 import 'package:quality_control/entity/app_state.dart';
+import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/event_item.dart';
 import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/request.dart';
@@ -34,11 +35,34 @@ class HistoryBloc extends IBloc {
 
   final int bottomNavigationBarIndex = 1;
   BuildContext context;
+  GlobalKey<ScaffoldState> scaffoldKey;
   final FimberLog _log = FimberLog('HistoryBloc');
 
   void initialize() {
     _appState = _repository.appState;
     currentRequest = _repository.getRequestById(requestId: _appState.requestId);
+  }
+
+  void onTapEditBottomMenu({Event event}) {
+    Widget Function() nextScreen;
+    if (event.eventType == EventType.SET_STATUS) {
+      nextScreen = _screenBuilder.getStatusScreenBuilder();
+    } else if (event.eventType == EventType.SET_RATING) {
+      nextScreen = _screenBuilder.getQualityScreenBuilder();
+    }
+    _repository.setAppState(
+        newAppState: AppState(event: event));
+
+    Navigator.pushReplacement(
+        context,
+        PageRouteBuilder<Widget>(
+            pageBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation) =>
+                nextScreen()));
+  }
+
+  void onTapExitBottomMenu() {
+    Navigator.pop(context);
   }
 
   void onTapBottomNavigationBar(int index) {

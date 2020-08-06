@@ -50,7 +50,7 @@ class Repository {
             requestFilterByDate: RequestFilterByDate.TODAY,
             requestFilterByText: '',
             user: _currentUser,
-            bottomNavigationBarIndex: 0));
+            bottomNavigationBarIndex: 1));
     _streamService.appStateStream.add(_appState);
 
     // Рассылаем зачитанные данные
@@ -83,6 +83,7 @@ class Repository {
     if (newAppState.intervalId != null) {
       _appState.intervalId = newAppState.intervalId;
     }
+    _appState.event = newAppState.event;
     if (newAppState.listPresentation != null) {
       _appState.listPresentation = newAppState.listPresentation;
     }

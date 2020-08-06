@@ -10,6 +10,7 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   HistoryBloc _bloc;
 
   @override
@@ -17,6 +18,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.initState();
     _bloc = BlocProvider.of(context);
     _bloc.context = context;
+    _bloc.scaffoldKey = _scaffoldKey;
   }
 
   @override
@@ -50,6 +52,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
         title: Text(

@@ -10,7 +10,7 @@ class Event {
       this.userDate,
       this.user,
       this.dateRequest,
-      this.intervalRequest,
+      this.workInterval,
       this.eventType,
       this.statusLabel,
       this.ratingLabel,
@@ -23,7 +23,7 @@ class Event {
   DateTime userDate; // время указанное пользователем
   User user; // пользователь, создавший событие
   DateTime dateRequest; // дата из заявки, может не указываться
-  WorkInterval intervalRequest; // интервал из заявки, может не указываться
+  WorkInterval workInterval; // интервал из заявки, может не указываться
   EventType eventType; // тип события
   String statusLabel; // метка установленного статуса, для события SET_STATUS
   String ratingLabel; // метка выставленной оценки, для события SET_RATING

@@ -144,7 +144,7 @@ class ReferenceBooks {
                 middleName: 'Петрович',
                 phone: '+79991111001'),
             dateRequest: yesterday,
-            intervalRequest: WorkInterval(
+            workInterval: WorkInterval(
                 id: '333',
                 dateBegin: yesterday
                     .trunc()
@@ -168,7 +168,7 @@ class ReferenceBooks {
                 middleName: 'Петрович',
                 phone: '+79991111001'),
             dateRequest: yesterday,
-            intervalRequest: WorkInterval(
+            workInterval: WorkInterval(
                 id: '333',
                 dateBegin: yesterday
                     .trunc()
@@ -237,7 +237,7 @@ class ReferenceBooks {
                 middleName: 'Петрович',
                 phone: '+79991111001'),
             dateRequest: yesterday,
-            intervalRequest: WorkInterval(
+            workInterval: WorkInterval(
               id: '333',
               dateBegin: yesterday
                   .trunc()
@@ -262,7 +262,7 @@ class ReferenceBooks {
                 middleName: 'Сидорович',
                 phone: '+799911110002'),
             dateRequest: yesterday,
-            intervalRequest: WorkInterval(
+            workInterval: WorkInterval(
                 id: '333',
                 dateBegin: yesterday
                     .trunc()

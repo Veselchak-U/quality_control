@@ -17,18 +17,7 @@ class QualityBloc extends IBloc {
       @required ScreenBuilder screenBuilder})
       : _repository = repository,
         _screenBuilder = screenBuilder {
-    _appState = _repository.appState;
-    request = repository.getRequestById(requestId: _appState.requestId);
-    intervalDates = request.getDatesFromIntervals();
-    selectedDate = DateTime.now().trunc();
-    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
-    selectedInterval = intervalsByDate[0];
-    ratingReferences = _repository.ratingReferences;
-    presetComments = [];
-    isPresetCommentRequared = false;
-    selectedPresetComment = null;
-    inputedComments = '';
-
+    initialize();
     _log.i('create');
   }
 
@@ -50,6 +39,21 @@ class QualityBloc extends IBloc {
   final int bottomNavigationBarIndex = 3;
   BuildContext context;
   final FimberLog _log = FimberLog('QualityBloc');
+
+  bool initialize() {
+    _appState = _repository.appState;
+    request = _repository.getRequestById(requestId: _appState.requestId);
+    intervalDates = request.getDatesFromIntervals();
+    selectedDate = DateTime.now().trunc();
+    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+    selectedInterval = intervalsByDate[0];
+    ratingReferences = _repository.ratingReferences;
+    presetComments = [];
+    isPresetCommentRequared = false;
+    selectedPresetComment = null;
+    inputedComments = '';
+    return true;
+  }
 
   void onTapBottomNavigationBar(int index) {
     if (index != bottomNavigationBarIndex) {
@@ -101,7 +105,7 @@ class QualityBloc extends IBloc {
         systemDate: DateTime.now(),
         user: _appState.user,
         dateRequest: selectedDate,
-        intervalRequest: selectedInterval,
+        workInterval: selectedInterval,
         eventType: EventType.SET_RATING,
         ratingLabel: selectedRating.label,
         ratingComment: selectedPresetComment,

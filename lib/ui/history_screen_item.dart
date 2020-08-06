@@ -19,11 +19,13 @@ class HistoryScreenItem extends StatelessWidget {
 
     if (eventItem.type == EventItemType.EVENT) {
       result = Container(
-          alignment:
-              eventItem.isAlien ? Alignment.centerLeft : Alignment.centerRight,
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: FractionallySizedBox(
-            widthFactor: 0.9,
+        alignment:
+            eventItem.isAlien ? Alignment.centerLeft : Alignment.centerRight,
+        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: FractionallySizedBox(
+          widthFactor: 0.9,
+          child: GestureDetector(
+            onTap: _showBottomSheet,
             child: Container(
               decoration: BoxDecoration(
                   color:
@@ -74,7 +76,9 @@ class HistoryScreenItem extends StatelessWidget {
                 ),
               ),
             ),
-          ));
+          ),
+        ),
+      );
     } else if (eventItem.type == EventItemType.DATE_LABEL) {
       result = Padding(
           padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -101,7 +105,7 @@ class HistoryScreenItem extends StatelessWidget {
   String _getPeriodText() {
     String result = '';
     DateTime date = eventItem.event.dateRequest;
-    WorkInterval interval = eventItem.event.intervalRequest;
+    WorkInterval interval = eventItem.event.workInterval;
 
     if (date == null && interval == null) {
       result = 'Для всей заявки';
@@ -138,7 +142,7 @@ class HistoryScreenItem extends StatelessWidget {
       if (event.comment != null && event.comment.isNotEmpty) {
         comment = ', комментарии: ${event.comment}';
       }
-      var action = event.parentId == null ? 'установил' : 'изменил';
+      var action = event.parentId == null ? 'установил' : 'внёс изменения:';
       result = '$action статус "$statusName"$userDate$comment';
     } else if (eventType == EventType.SET_RATING) {
       //
@@ -164,9 +168,43 @@ class HistoryScreenItem extends StatelessWidget {
           unionComment = ', комментарии: $comment';
         }
       }
-      var action = event.parentId == null ? 'выставил' : 'изменил';
-      result = '$action оценку "$ratingName"$unionComment';
+      var action = event.parentId == null ? 'выставил оценку' : 'внёс изменения: оценка';
+      result = '$action "$ratingName"$unionComment';
     }
     return result;
+  }
+
+  void _showBottomSheet() {
+    bloc.scaffoldKey.currentState.showBottomSheet<void>(
+      (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+//        color: Colors.yellow[50],
+            border: Border.all(),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
+          ),
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.edit),
+                title: Text('Корректировка события'),
+                onTap: () {
+                  bloc.onTapEditBottomMenu(event: eventItem.event);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.close),
+                title: Text('Отмена'),
+                onTap: bloc.onTapExitBottomMenu,
+              ),
+            ],
+          ),
+        );
+      },
+//          elevation: 25,
+    );
   }
 }

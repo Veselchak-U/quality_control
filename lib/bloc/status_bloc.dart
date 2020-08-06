@@ -12,18 +12,10 @@ import 'package:quality_control/extension/datetime_extension.dart';
 
 class StatusBloc extends IBloc {
   StatusBloc(
-      {@required Repository repository,
-      @required ScreenBuilder screenBuilder})
+      {@required Repository repository, @required ScreenBuilder screenBuilder})
       : _repository = repository,
         _screenBuilder = screenBuilder {
-    _appState = _repository.appState;
-    request = repository.getRequestById(requestId: _appState.requestId);
-    intervalDates = request.getDatesFromIntervals();
-    selectedDate = DateTime.now().trunc();
-    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
-    selectedInterval = intervalsByDate[0];
-    statusReferences = _repository.statusReferences;
-    inputedComments = '';
+    initialize();
     _log.i('create');
   }
 
@@ -40,10 +32,44 @@ class StatusBloc extends IBloc {
   TimeOfDay selectedFactTime;
   String inputedComments;
   AppState _appState;
+  bool isUpdateMode = false; // режим корректировки
+  Event event; // корректируемое событие
 
   final int bottomNavigationBarIndex = 2;
   BuildContext context;
   final FimberLog _log = FimberLog('StatusBloc');
+
+  bool initialize() {
+    _appState = _repository.appState;
+    request = _repository.getRequestById(requestId: _appState.requestId);
+    statusReferences = _repository.statusReferences;
+
+    if (_appState.event != null) {
+      // режим корректировки
+      isUpdateMode = true;
+      event = _appState.event;
+      intervalDates = <DateTime>[event.dateRequest];
+      selectedDate = event.dateRequest;
+      intervalsByDate = <WorkInterval>[event.workInterval];
+      selectedInterval = event.workInterval;
+      selectedStatus =
+          statusReferences.firstWhere((e) => e.label == event.statusLabel);
+      selectedFactDate = event.userDate.trunc();
+      selectedFactTime =
+          TimeOfDay(hour: event.userDate.hour, minute: event.userDate.minute);
+      inputedComments = event.comment ?? '';
+    } else {
+      // режим добавления
+      intervalDates = request.getDatesFromIntervals();
+      selectedDate = DateTime.now().trunc(); // TODO(dyv): брать ближайшую дату
+      intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+      selectedInterval =
+          intervalsByDate[0]; // TODO(dyv): брать ближайший интервал
+      inputedComments = '';
+    }
+
+    return true;
+  }
 
   void onTapBottomNavigationBar(int index) {
     if (index != bottomNavigationBarIndex) {
@@ -83,16 +109,17 @@ class StatusBloc extends IBloc {
           hours: selectedFactTime.hour, minutes: selectedFactTime.minute));
     }
 
-    var event = Event(
+    var newEvent = Event(
+        parentId: isUpdateMode ? event.id : null,
         systemDate: DateTime.now(),
         userDate: userDate,
         user: _repository.appState.user,
         dateRequest: selectedDate,
-        intervalRequest: selectedInterval,
+        workInterval: selectedInterval,
         eventType: EventType.SET_STATUS,
         statusLabel: selectedStatus.label,
         comment: inputedComments);
-    _repository.addEvent(requestId: request.id, event: event);
+    _repository.addEvent(requestId: request.id, event: newEvent);
 
     onTapBottomNavigationBar(1);
     //    Navigator.pop(context);
@@ -100,6 +127,10 @@ class StatusBloc extends IBloc {
 
   @override
   void dispose() {
+    // сбрасываем режим корректировки, если он был
+    if (isUpdateMode) {
+      _repository.setAppState(newAppState: AppState(event: null));
+    }
     _log.i('dispose');
   }
 }
