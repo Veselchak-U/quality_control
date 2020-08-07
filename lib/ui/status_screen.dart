@@ -37,11 +37,19 @@ class _StatusScreenState extends State<StatusScreen> {
         var time = _bloc.selectedFactTime;
         timeFieldController.text =
             '${time.hour < 10 ? '0' : ''}${time.hour}:${time.minute < 10 ? '0' : ''}${time.minute}';
-        if (_bloc.inputedComments.isNotEmpty) {
-          commentFieldController.text = _bloc.inputedComments;
-        }
+      }
+      if (_bloc.inputtedComments.isNotEmpty) {
+        commentFieldController.text = _bloc.inputtedComments;
       }
     }
+  }
+
+  @override
+  void dispose() {
+    dateFieldController.dispose();
+    timeFieldController.dispose();
+    commentFieldController.dispose();
+    super.dispose();
   }
 
   @override
@@ -74,6 +82,13 @@ class _StatusScreenState extends State<StatusScreen> {
       ],
     );
 
+    var rowDivider = SizedBox(
+      height: 8,
+    );
+    var headerDivider = SizedBox(
+      height: 4,
+    );
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -92,7 +107,7 @@ class _StatusScreenState extends State<StatusScreen> {
             color: Colors.white30,
             child: SingleChildScrollView(
               child: Padding(
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                  padding: EdgeInsets.fromLTRB(32, 8, 32, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -100,13 +115,23 @@ class _StatusScreenState extends State<StatusScreen> {
                         'Дата работы:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      headerDivider,
                       Container(
                         alignment: Alignment.centerRight,
                         padding: EdgeInsets.only(right: 32),
-                        child: FractionallySizedBox(
-                          widthFactor: 0.5,
+                        child: Container(
+                          width: 140,
+                          /*FractionallySizedBox(
+                          widthFactor: 0.5,*/
                           child: DropdownButtonFormField<DateTime>(
-                            hint: Text('Дата работы'),
+                            hint: isUpdateMode
+                                ? Align(
+                                    alignment: Alignment.center,
+                                    child:
+                                        Text(_bloc.selectedDate.dateForHuman()))
+                                : Align(
+                                    alignment: Alignment.center,
+                                    child: Text('Дата работы')),
                             value: _bloc.selectedDate,
                             elevation: 4,
                             isExpanded: true,
@@ -117,15 +142,18 @@ class _StatusScreenState extends State<StatusScreen> {
                                 border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(8)))),
-                            items: _bloc.intervalDates
-                                .map((DateTime e) => DropdownMenuItem<DateTime>(
-                                    child: Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          e.dateForHuman(),
-                                        )),
-                                    value: e))
-                                .toList(),
+                            items: isUpdateMode
+                                ? null
+                                : _bloc.intervalDates
+                                    .map((DateTime e) =>
+                                        DropdownMenuItem<DateTime>(
+                                            child: Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  e.dateForHuman(),
+                                                )),
+                                            value: e))
+                                    .toList(),
                             onChanged: (DateTime value) {
                               if (!isUpdateMode) {
                                 setState(() {
@@ -139,20 +167,28 @@ class _StatusScreenState extends State<StatusScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      rowDivider,
                       Text(
                         'Интервал работы:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      headerDivider,
                       Container(
                           alignment: Alignment.centerRight,
                           padding: EdgeInsets.only(right: 32),
-                          child: FractionallySizedBox(
-                            widthFactor: 0.5,
+                          child: Container(
+                            width: 140,
+                            /*FractionallySizedBox(
+                            widthFactor: 0.5,*/
                             child: DropdownButtonFormField<WorkInterval>(
-                              hint: Text('Интервал работы'),
+                              hint: isUpdateMode
+                                  ? Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                          _bloc.selectedInterval.toString()))
+                                  : Align(
+                                      alignment: Alignment.center,
+                                      child: Text('Интервал работы')),
                               value: _bloc.selectedInterval,
                               elevation: 4,
                               isExpanded: true,
@@ -163,14 +199,16 @@ class _StatusScreenState extends State<StatusScreen> {
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(8)))),
-                              items: _bloc.intervalsByDate
-                                  .map((WorkInterval e) =>
-                                      DropdownMenuItem<WorkInterval>(
-                                          child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(e.toString())),
-                                          value: e))
-                                  .toList(),
+                              items: isUpdateMode
+                                  ? null
+                                  : _bloc.intervalsByDate
+                                      .map((WorkInterval e) =>
+                                          DropdownMenuItem<WorkInterval>(
+                                              child: Align(
+                                                  alignment: Alignment.center,
+                                                  child: Text(e.toString())),
+                                              value: e))
+                                      .toList(),
                               onChanged: (WorkInterval value) {
                                 if (!isUpdateMode) {
                                   setState(() {
@@ -183,18 +221,19 @@ class _StatusScreenState extends State<StatusScreen> {
                               },
                             ),
                           )),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      rowDivider,
                       Text(
                         'Статус:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      headerDivider,
                       Container(
-                        alignment: Alignment.centerRight,
-                        padding: EdgeInsets.only(right: 32),
-                        child: FractionallySizedBox(
-                            widthFactor: 0.7,
+                        alignment: Alignment.center,
+//                        padding: EdgeInsets.only(right: 32),
+                        child: Container(
+                            width: 200,
+                            /*FractionallySizedBox(
+                            widthFactor: 0.7,*/
                             child: DropdownButtonFormField<Status>(
                               value: _bloc.selectedStatus,
                               elevation: 4,
@@ -210,7 +249,10 @@ class _StatusScreenState extends State<StatusScreen> {
                                   .map((Status e) => DropdownMenuItem<Status>(
                                       child: Align(
                                           alignment: Alignment.center,
-                                          child: Text(e.name)),
+                                          child: Text(
+                                            e.name,
+                                            overflow: TextOverflow.ellipsis,
+                                          )),
                                       value: e))
                                   .toList(),
                               onChanged: (Status value) {
@@ -226,31 +268,28 @@ class _StatusScreenState extends State<StatusScreen> {
                               },
                             )),
                       ),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      rowDivider,
                       Text(
-                        'Фактическое выполнение:',
+                        'Пользовательское время:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      headerDivider,
                       Container(
 //                        alignment: Alignment.topLeft,
-                        padding: EdgeInsets.only(right: 32),
+//                        padding: EdgeInsets.only(right: 32),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('дата'),
-                            SizedBox(
-                              width: 8,
-                            ),
+//                            Spacer(),
+//                            Text('дата'),
+//                            SizedBox(
+//                              width: 8,
+//                            ),
                             Container(
                               width: 100,
                               child: TextFormField(
                                 decoration: InputDecoration(
-//                                    labelText: 'Дата',
+                                    labelText: 'Дата',
                                     contentPadding: EdgeInsets.only(left: 8),
                                     filled: _bloc.selectedFactDate == null,
                                     fillColor: _fillColor,
@@ -285,15 +324,15 @@ class _StatusScreenState extends State<StatusScreen> {
                             SizedBox(
                               width: 30,
                             ),
-                            Text('время'),
-                            SizedBox(
-                              width: 8,
-                            ),
+//                            Text('время'),
+//                            SizedBox(
+//                              width: 8,
+//                            ),
                             Container(
                               width: 70,
                               child: TextFormField(
                                 decoration: InputDecoration(
-//                                    labelText: 'Время',
+                                    labelText: 'Время',
                                     contentPadding: EdgeInsets.only(left: 8),
                                     filled: _bloc.selectedFactTime == null,
                                     fillColor: _fillColor,
@@ -324,42 +363,37 @@ class _StatusScreenState extends State<StatusScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 16,
-                      ),
+                      rowDivider,
                       Text(
                         'Комментарий к статусу:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      headerDivider,
                       TextFormField(
                         autofocus: false,
                         maxLines: 4,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(8),
-                            filled: _bloc.inputedComments.isEmpty,
+                            filled: _bloc.inputtedComments.isEmpty,
                             fillColor: _fillColor,
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(8)))),
                         controller: commentFieldController,
-                        onFieldSubmitted: (String value) {
+                        onChanged: (String value) {
                           setState(() {
-                            _bloc.inputedComments = value;
+                            _bloc.inputtedComments = value;
                           });
                         },
                         validator: (String value) {
                           return null;
                         },
                       ),
-                      SizedBox(
-                        height: 16,
-                      ),
+                      rowDivider,
                       Center(
                         child: MaterialButton(
+                          elevation: 8,
                           child: Text(
                             isUpdateMode ? 'Корректировать' : 'Добавить',
                             style: TextStyle(color: Colors.white),

@@ -30,7 +30,7 @@ class StatusBloc extends IBloc {
   Status selectedStatus;
   DateTime selectedFactDate;
   TimeOfDay selectedFactTime;
-  String inputedComments;
+  String inputtedComments;
   AppState _appState;
   bool isUpdateMode = false; // режим корректировки
   Event event; // корректируемое событие
@@ -48,16 +48,16 @@ class StatusBloc extends IBloc {
       // режим корректировки
       isUpdateMode = true;
       event = _appState.event;
-      intervalDates = <DateTime>[event.dateRequest];
+//      intervalDates = <DateTime>[event.dateRequest];
       selectedDate = event.dateRequest;
-      intervalsByDate = <WorkInterval>[event.workInterval];
+//      intervalsByDate = <WorkInterval>[event.workInterval];
       selectedInterval = event.workInterval;
       selectedStatus =
           statusReferences.firstWhere((e) => e.label == event.statusLabel);
       selectedFactDate = event.userDate.trunc();
       selectedFactTime =
           TimeOfDay(hour: event.userDate.hour, minute: event.userDate.minute);
-      inputedComments = event.comment ?? '';
+      inputtedComments = event.comment ?? '';
     } else {
       // режим добавления
       intervalDates = request.getDatesFromIntervals();
@@ -65,7 +65,7 @@ class StatusBloc extends IBloc {
       intervalsByDate = request.getIntervalsByDate(date: selectedDate);
       selectedInterval =
           intervalsByDate[0]; // TODO(dyv): брать ближайший интервал
-      inputedComments = '';
+      inputtedComments = '';
     }
 
     return true;
@@ -118,7 +118,7 @@ class StatusBloc extends IBloc {
         workInterval: selectedInterval,
         eventType: EventType.SET_STATUS,
         statusLabel: selectedStatus.label,
-        comment: inputedComments);
+        comment: inputtedComments);
     _repository.addEvent(requestId: request.id, event: newEvent);
 
     onTapBottomNavigationBar(1);

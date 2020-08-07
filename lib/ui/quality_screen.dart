@@ -1,11 +1,12 @@
 import 'dart:ui';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/quality_bloc.dart';
+import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class QualityScreen extends StatefulWidget {
   @override
@@ -19,15 +20,28 @@ class _QualityScreenState extends State<QualityScreen> {
 
 //  final Color _fillColor = Color(0xfff0f0f0);
   final Color _fillColor = Color(0xffe5e5e5);
-  var dateFieldController = TextEditingController();
-  var timeFieldController = TextEditingController();
   var commentFieldController = TextEditingController();
+  bool isUpdateMode;
+  Event event;
 
   @override
   void initState() {
     super.initState();
     _bloc = BlocProvider.of(context);
     _bloc.context = context;
+    isUpdateMode = _bloc.isUpdateMode;
+    if (isUpdateMode) {
+      event = _bloc.event;
+      if (_bloc.inputtedComments.isNotEmpty) {
+        commentFieldController.text = _bloc.inputtedComments;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    commentFieldController.dispose();
+    super.dispose();
   }
 
   @override
@@ -62,6 +76,13 @@ class _QualityScreenState extends State<QualityScreen> {
       ],
     );
 
+    var rowDivider = SizedBox(
+      height: 8,
+    );
+    var headerDivider = SizedBox(
+      height: 4,
+    );
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -78,7 +99,7 @@ class _QualityScreenState extends State<QualityScreen> {
             color: Colors.white30,
             child: SingleChildScrollView(
               child: Padding(
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                  padding: EdgeInsets.fromLTRB(32, 8, 32, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -86,57 +107,80 @@ class _QualityScreenState extends State<QualityScreen> {
                         'Дата работы:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      headerDivider,
                       Container(
                         alignment: Alignment.centerRight,
                         padding: EdgeInsets.only(right: 32),
-                        child: FractionallySizedBox(
-                          widthFactor: 0.5,
-                          child: DropdownButtonFormField<DateTime>(
-                            hint: Text('Дата работы'),
-                            value: _bloc.selectedDate,
-                            elevation: 4,
-                            isExpanded: true,
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(0),
-                                filled: _bloc.selectedDate == null,
-                                fillColor: _fillColor,
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8)))),
-                            items: _bloc.intervalDates
-                                .map((DateTime e) => DropdownMenuItem<DateTime>(
-                                    child: Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          e.dateForHuman(),
-                                        )),
-                                    value: e))
-                                .toList(),
-                            onChanged: (DateTime value) {
-                              setState(() {
-                                _bloc.updateIntervalList(date: value);
-                              });
-                            },
-                            validator: (DateTime value) {
-                              return null;
-                            },
+                        child: Container(
+                          width: 140,
+                          /*FractionallySizedBox(
+                          widthFactor: 0.5,*/
+                          child: Center(
+                            child: DropdownButtonFormField<DateTime>(
+                              hint: isUpdateMode
+                                  ? Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                          _bloc.selectedDate.dateForHuman()))
+                                  : Align(
+                                      alignment: Alignment.center,
+                                      child: Text('Дата работы')),
+                              value: _bloc.selectedDate,
+                              elevation: 4,
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(0),
+                                  filled: _bloc.selectedDate == null,
+                                  fillColor: _fillColor,
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8)))),
+                              items: isUpdateMode
+                                  ? null
+                                  : _bloc.intervalDates
+                                      .map((DateTime e) =>
+                                          DropdownMenuItem<DateTime>(
+                                              child: Align(
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    e.dateForHuman(),
+                                                  )),
+                                              value: e))
+                                      .toList(),
+                              onChanged: (DateTime value) {
+                                setState(() {
+                                  _bloc.updateIntervalList(date: value);
+                                });
+                              },
+                              validator: (DateTime value) {
+                                return null;
+                              },
+                            ),
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      rowDivider,
                       Text(
                         'Интервал работы:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      headerDivider,
                       Container(
                           alignment: Alignment.centerRight,
                           padding: EdgeInsets.only(right: 32),
-                          child: FractionallySizedBox(
-                            widthFactor: 0.5,
+                          child: Container(
+                            width: 140,
+                            /*FractionallySizedBox(
+                            widthFactor: 0.5,*/
                             child: DropdownButtonFormField<WorkInterval>(
-                              hint: Text('Интервал работы'),
+                              hint: isUpdateMode
+                                  ? Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                          _bloc.selectedInterval.toString()))
+                                  : Align(
+                                      alignment: Alignment.center,
+                                      child: Text('Интервал работы')),
                               value: _bloc.selectedInterval,
                               elevation: 4,
                               isExpanded: true,
@@ -147,14 +191,16 @@ class _QualityScreenState extends State<QualityScreen> {
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(8)))),
-                              items: _bloc.intervalsByDate
-                                  .map((WorkInterval e) =>
-                                      DropdownMenuItem<WorkInterval>(
-                                          child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(e.toString())),
-                                          value: e))
-                                  .toList(),
+                              items: isUpdateMode
+                                  ? null
+                                  : _bloc.intervalsByDate
+                                      .map((WorkInterval e) =>
+                                          DropdownMenuItem<WorkInterval>(
+                                              child: Align(
+                                                  alignment: Alignment.center,
+                                                  child: Text(e.toString())),
+                                              value: e))
+                                      .toList(),
                               onChanged: (WorkInterval value) {
                                 setState(() {
                                   _bloc.selectedInterval = value;
@@ -165,9 +211,7 @@ class _QualityScreenState extends State<QualityScreen> {
                               },
                             ),
                           )),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      rowDivider,
                       Text(
                         'Оценка выполнения:',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -179,22 +223,24 @@ class _QualityScreenState extends State<QualityScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            RatingBar(
-                              itemCount: 5,
-                              unratedColor: primaryColor.withAlpha(50),
-                              glowColor: primaryColor,
-                              itemPadding: EdgeInsets.symmetric(horizontal: 4),
-                              itemBuilder: (BuildContext context, _) => Icon(
-                                Icons.star,
+                            SmoothStarRating(
+                                allowHalfRating: false,
+                                onRated: (double value) {
+                                  setState(() {
+                                    _bloc.onSelectRating(value);
+                                  });
+                                },
+                                starCount: _bloc.ratingReferences.length,
+                                rating: isUpdateMode
+                                    ? _bloc.selectedRatingIndex + 1
+                                    : 0,
+                                size: 32,
+                                isReadOnly: false,
+                                defaultIconData: Icons.star_border,
+                                filledIconData: Icons.star,
                                 color: primaryColor,
-                              ),
-                              onRatingUpdate: (double value) {
-                                setState(() {
-                                  _bloc.onSelectRating(value);
-                                });
-                                print(value);
-                              },
-                            ),
+                                borderColor: primaryColor,
+                                spacing: 8),
                             SizedBox(
                               height: 8,
                             ),
@@ -212,9 +258,7 @@ class _QualityScreenState extends State<QualityScreen> {
                         'Комментарий к оценке:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      headerDivider,
                       Container(
                         alignment: Alignment.centerRight,
 //                        padding: EdgeInsets.only(right: 32),
@@ -235,7 +279,10 @@ class _QualityScreenState extends State<QualityScreen> {
                                   .map((String e) => DropdownMenuItem<String>(
                                       child: Align(
                                           alignment: Alignment.center,
-                                          child: Text(e)),
+                                          child: Text(
+                                            e,
+                                            overflow: TextOverflow.ellipsis,
+                                          )),
                                       value: e))
                                   .toList(),
                               onChanged: (String value) {
@@ -244,7 +291,7 @@ class _QualityScreenState extends State<QualityScreen> {
                                 });
                               },
                               validator: (String value) {
-                                if (_bloc.isPresetCommentRequared &&
+                                if (_bloc.isPresetCommentRequired &&
                                     value == null) {
                                   return 'Обязательное поле';
                                 }
@@ -252,47 +299,42 @@ class _QualityScreenState extends State<QualityScreen> {
                               },
                             )),
                       ),
-                      SizedBox(
-                        height: 16,
-                      ),
+                      rowDivider,
                       Text(
                         'Дополнение к комментарию:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      headerDivider,
                       TextFormField(
                         autofocus: false,
                         maxLines: 3,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(8),
-                            filled: _bloc.inputedComments.isEmpty,
+                            filled: _bloc.inputtedComments.isEmpty,
                             fillColor: _fillColor,
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(8)))),
                         controller: commentFieldController,
-                        onFieldSubmitted: (String value) {
+                        onChanged: (String value) {
                           setState(() {
-                            _bloc.inputedComments = value;
+                            _bloc.inputtedComments = value;
                           });
                         },
                         validator: (String value) {
                           return null;
                         },
                       ),
-                      SizedBox(
-                        height: 16,
-                      ),
+                      rowDivider,
                       Center(
                         child: MaterialButton(
                           child: Text(
-                            'Добавить',
+                            isUpdateMode ? 'Корректировать' : 'Добавить',
                             style: TextStyle(color: Colors.white),
                           ),
                           color: primaryColor,
+                          elevation: 8,
                           onPressed: () {
                             if (_formKey.currentState.validate() &&
                                 _bloc.selectedRating != null) {

@@ -9,12 +9,10 @@ import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
-import 'package:quality_control/service/stream_service.dart';
 
 class QualityBloc extends IBloc {
   QualityBloc(
-      {@required Repository repository,
-      @required ScreenBuilder screenBuilder})
+      {@required Repository repository, @required ScreenBuilder screenBuilder})
       : _repository = repository,
         _screenBuilder = screenBuilder {
     initialize();
@@ -23,18 +21,21 @@ class QualityBloc extends IBloc {
 
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
-  Request request;
+  Request request; // заявка
   List<DateTime> intervalDates; // даты из интервалов по заявке
   List<WorkInterval> intervalsByDate; // интервалы по текущей дате
   DateTime selectedDate;
   WorkInterval selectedInterval;
   List<Rating> ratingReferences;
   Rating selectedRating;
+  double selectedRatingIndex;
   List<String> presetComments;
-  bool isPresetCommentRequared;
+  bool isPresetCommentRequired;
   String selectedPresetComment;
-  String inputedComments;
+  String inputtedComments;
   AppState _appState;
+  bool isUpdateMode = false; // режим корректировки
+  Event event; // корректируемое событие
 
   final int bottomNavigationBarIndex = 3;
   BuildContext context;
@@ -43,15 +44,35 @@ class QualityBloc extends IBloc {
   bool initialize() {
     _appState = _repository.appState;
     request = _repository.getRequestById(requestId: _appState.requestId);
-    intervalDates = request.getDatesFromIntervals();
-    selectedDate = DateTime.now().trunc();
-    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
-    selectedInterval = intervalsByDate[0];
     ratingReferences = _repository.ratingReferences;
-    presetComments = [];
-    isPresetCommentRequared = false;
-    selectedPresetComment = null;
-    inputedComments = '';
+
+    if (_appState.event != null) {
+      // режим корректировки
+      isUpdateMode = true;
+      event = _appState.event;
+//      intervalDates = <DateTime>[event.dateRequest];
+      selectedDate = event.dateRequest;
+//      intervalsByDate = <WorkInterval>[event.workInterval];
+      selectedInterval = event.workInterval;
+      selectedRating =
+          ratingReferences.firstWhere((e) => e.label == event.ratingLabel);
+      selectedRatingIndex = ratingReferences.indexOf(selectedRating).toDouble();
+      presetComments = selectedRating.presetComments ?? [];
+      isPresetCommentRequired = selectedRating.isCommentRequired ?? false;
+      selectedPresetComment = event.ratingComment;
+      inputtedComments = event.comment ?? '';
+    } else {
+      // режим добавления
+      intervalDates = request.getDatesFromIntervals();
+      selectedDate = DateTime.now().trunc(); // TODO(dyv): брать ближайшую дату
+      intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+      selectedInterval =
+          intervalsByDate[0]; // TODO(dyv): брать ближайший интервал
+      presetComments = [];
+      isPresetCommentRequired = false;
+      selectedPresetComment = null;
+      inputtedComments = '';
+    }
     return true;
   }
 
@@ -90,18 +111,19 @@ class QualityBloc extends IBloc {
     if (value == 0.0) {
       selectedRating = null;
       presetComments = [];
-      isPresetCommentRequared = false;
+      isPresetCommentRequired = false;
     } else {
       selectedRating = ratingReferences[value.toInt() - 1];
       presetComments = selectedRating.presetComments ?? [];
-      isPresetCommentRequared = selectedRating.isCommentRequired ?? false;
+      isPresetCommentRequired = selectedRating.isCommentRequired ?? false;
     }
     selectedPresetComment = null;
     _log.i('onSelectRating = ${selectedRating?.name}');
   }
 
   void onTapAddButton() {
-    var event = Event(
+    var newEvent = Event(
+        parentId: isUpdateMode ? event.id : null,
         systemDate: DateTime.now(),
         user: _appState.user,
         dateRequest: selectedDate,
@@ -109,8 +131,8 @@ class QualityBloc extends IBloc {
         eventType: EventType.SET_RATING,
         ratingLabel: selectedRating.label,
         ratingComment: selectedPresetComment,
-        comment: inputedComments);
-    _repository.addEvent(requestId: request.id, event: event);
+        comment: inputtedComments);
+    _repository.addEvent(requestId: request.id, event: newEvent);
 
     onTapBottomNavigationBar(1);
     //    Navigator.pop(context);
@@ -118,6 +140,10 @@ class QualityBloc extends IBloc {
 
   @override
   void dispose() {
+    // сбрасываем режим корректировки, если он был
+    if (isUpdateMode) {
+      _repository.setAppState(newAppState: AppState(event: null));
+    }
     _log.i('dispose');
   }
 }

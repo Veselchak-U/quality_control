@@ -1,10 +1,11 @@
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/user.dart';
+import 'package:quality_control/util/utils.dart';
 
 // Событие по заявке
 class Event {
   Event(
-      {this.id,
+      {String id,
       this.parentId,
       this.systemDate,
       this.userDate,
@@ -15,7 +16,8 @@ class Event {
       this.statusLabel,
       this.ratingLabel,
       this.ratingComment,
-      this.comment});
+      this.comment})
+      : id = id ?? Utils.nextEventId.toString();
 
   String id;
   String parentId; // id корректируемого (первого в цепочке) события
