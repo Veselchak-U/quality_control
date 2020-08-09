@@ -62,8 +62,8 @@ class ReferenceBooks {
           'Вовремя',
           'Всё вышеперечисленное'
         ],
-        isCommentRequired: false,
-        isCanUpdate: true)
+        isCommentRequired: true,
+        isCanUpdate: false)
   ];
 
   static List<Request> getRequests() {
@@ -134,8 +134,8 @@ class ReferenceBooks {
         Event(
             id: '${idCounter++}',
             systemDate: yesterday,
-            userDate: yesterday
-                .subtract(Duration(minutes: Random().nextInt(30))),
+            userDate:
+                yesterday.subtract(Duration(minutes: Random().nextInt(30))),
             user: User(
                 id: '11',
                 userRole: UserRole.DELEGAT,
@@ -146,20 +146,17 @@ class ReferenceBooks {
             dateRequest: yesterday,
             workInterval: WorkInterval(
                 id: '333',
-                dateBegin: yesterday
-                    .trunc()
-                    .add(Duration(hours: 7, minutes: 25)),
-                dateEnd: yesterday
-                    .trunc()
-                    .add(Duration(hours: 8))),
+                dateBegin:
+                    yesterday.trunc().add(Duration(hours: 7, minutes: 25)),
+                dateEnd: yesterday.trunc().add(Duration(hours: 8))),
             eventType: EventType.SET_STATUS,
             statusLabel: 'START',
             comment: 'Коммент к статусу'),
         Event(
             id: '${idCounter++}',
             systemDate: yesterday,
-            userDate: yesterday
-                .subtract(Duration(minutes: Random().nextInt(30))),
+            userDate:
+                yesterday.subtract(Duration(minutes: Random().nextInt(30))),
             user: User(
                 id: '11',
                 userRole: UserRole.DELEGAT,
@@ -170,12 +167,10 @@ class ReferenceBooks {
             dateRequest: yesterday,
             workInterval: WorkInterval(
                 id: '333',
-                dateBegin: yesterday
-                    .trunc()
-                    .add(Duration(hours: 12, minutes: 30)),
-                dateEnd: yesterday
-                    .trunc()
-                    .add(Duration(hours: 12, minutes: 40))),
+                dateBegin:
+                    yesterday.trunc().add(Duration(hours: 12, minutes: 30)),
+                dateEnd:
+                    yesterday.trunc().add(Duration(hours: 12, minutes: 40))),
             eventType: EventType.SET_RATING,
             ratingLabel: '5',
             ratingComment: 'Аккуратно',
@@ -227,8 +222,8 @@ class ReferenceBooks {
         Event(
             id: '${idCounter++}',
             systemDate: yesterday,
-            userDate: yesterday
-                .subtract(Duration(minutes: Random().nextInt(30))),
+            userDate:
+                yesterday.subtract(Duration(minutes: Random().nextInt(30))),
             user: User(
                 id: '11',
                 userRole: UserRole.DELEGAT,
@@ -239,12 +234,8 @@ class ReferenceBooks {
             dateRequest: yesterday,
             workInterval: WorkInterval(
               id: '333',
-              dateBegin: yesterday
-                  .trunc()
-                  .add(Duration(hours: 15)),
-              dateEnd: yesterday
-                  .trunc()
-                  .add(Duration(hours: 16)),
+              dateBegin: yesterday.trunc().add(Duration(hours: 15)),
+              dateEnd: yesterday.trunc().add(Duration(hours: 16)),
             ),
             eventType: EventType.SET_STATUS,
             statusLabel: 'START',
@@ -252,8 +243,8 @@ class ReferenceBooks {
         Event(
             id: '${idCounter++}',
             systemDate: yesterday,
-            userDate: yesterday
-                .subtract(Duration(minutes: Random().nextInt(30))),
+            userDate:
+                yesterday.subtract(Duration(minutes: Random().nextInt(30))),
             user: User(
                 id: '12',
                 userRole: UserRole.DELEGAT,
@@ -264,12 +255,9 @@ class ReferenceBooks {
             dateRequest: yesterday,
             workInterval: WorkInterval(
                 id: '333',
-                dateBegin: yesterday
-                    .trunc()
-                    .add(Duration(hours: 16, minutes: 30)),
-                dateEnd: yesterday
-                    .trunc()
-                    .add(Duration(hours: 17))),
+                dateBegin:
+                    yesterday.trunc().add(Duration(hours: 16, minutes: 30)),
+                dateEnd: yesterday.trunc().add(Duration(hours: 17))),
             eventType: EventType.SET_RATING,
             ratingLabel: '5',
             ratingComment: 'Аккуратно',

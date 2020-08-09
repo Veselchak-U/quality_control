@@ -12,94 +12,89 @@ class HistoryScreenItem extends StatelessWidget {
 
   final EventItem eventItem;
   final HistoryBloc bloc;
+  final TextStyle headerTextStyle =
+      TextStyle(fontWeight: FontWeight.bold, fontSize: 14);
 
   @override
   Widget build(BuildContext context) {
+    var primaryColor = Theme.of(context).primaryColor;
     Widget result;
 
     if (eventItem.type == EventItemType.EVENT) {
-      result = Container(
-        alignment:
-            eventItem.isAlien ? Alignment.centerLeft : Alignment.centerRight,
-        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-        child: FractionallySizedBox(
-          widthFactor: 0.9,
-          child: GestureDetector(
-            onTap: _showBottomSheet,
-            child: Container(
-              decoration: BoxDecoration(
-                  color:
-                      eventItem.isAlien ? Colors.yellow[50] : Colors.green[50],
-                  border: Border.all(),
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                      bottomLeft: eventItem.isAlien
-                          ? Radius.circular(0)
-                          : Radius.circular(8),
-                      bottomRight: eventItem.isAlien
-                          ? Radius.circular(8)
-                          : Radius.circular(0))),
-              child: Padding(
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text('${eventItem.event.user.getUserRoleName()} ',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14)),
-                        Text(
-                          eventItem.event.user.toShortFIO(),
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        Spacer(),
-                        Text(
-                            eventItem.event.systemDate
-                                .formatDate('dd.MM.yy HH:mm'),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14)),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Text(_getPeriodText(), style: TextStyle(fontSize: 14)),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Text(_getEventText(), style: TextStyle(fontSize: 14)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
+      result = _getEventItem();
     } else if (eventItem.type == EventItemType.DATE_LABEL) {
-      result = Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Center(
-              child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                  ),
-                  child: Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Text(eventItem.labelText,
-                          style: TextStyle(fontSize: 14))))));
+      result = _getDateLabelItem(bgColor: primaryColor);
     } else if (eventItem.type == EventItemType.UNREAD_LABEL) {
       // TODO(dyv): допилить
       result = Text('Метка непрочитано: ${eventItem.labelText}');
     } else {
-      // TODO(dyv): допилить
-      result = Text('Неизвестный тип сообщения');
+      print('Unknown EventItemType');
     }
     return result;
+  }
+
+  Widget _getEventItem() {
+    return Container(
+      alignment:
+          eventItem.isAlien ? Alignment.centerLeft : Alignment.centerRight,
+      padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: FractionallySizedBox(
+        widthFactor: 0.9,
+        child: GestureDetector(
+          onTap: _showBottomSheet,
+          child: Container(
+            decoration: BoxDecoration(
+                color: eventItem.isAlien ? Colors.yellow[50] : Colors.green[50],
+                border: Border.all(),
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                    bottomLeft: eventItem.isAlien
+                        ? Radius.circular(0)
+                        : Radius.circular(8),
+                    bottomRight: eventItem.isAlien
+                        ? Radius.circular(8)
+                        : Radius.circular(0))),
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          alignment: WrapAlignment.start,
+                          children: [
+                            Text(eventItem.event.user.getUserRoleName(),
+                                style: headerTextStyle),
+                            Text(eventItem.event.user.toShortFIO(),
+                                style: headerTextStyle)
+                          ],
+                        ),
+                      ),
+                      Text(eventItem.event.systemDate.formatDate('HH:mm'),
+//                            overflow: TextOverflow.ellipsis,
+                          style: headerTextStyle),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Text(_getPeriodText(), style: TextStyle(fontSize: 14)),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Text(_getEventText(), style: TextStyle(fontSize: 14)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   String _getPeriodText() {
@@ -112,8 +107,8 @@ class HistoryScreenItem extends StatelessWidget {
     } else {
       if (date != null) {
         var andInterval =
-            interval == null ? '' : 'и интервала: ${interval.toString()}';
-        result = 'Для даты: ${date.dateForHuman()} $andInterval';
+            interval == null ? '' : ' и интервала: ${interval.toString()}';
+        result = 'Для даты: ${date.dateForHuman()}$andInterval';
       } else {
         result = 'Для интервала: ${interval.toString()}';
       }
@@ -130,13 +125,18 @@ class HistoryScreenItem extends StatelessWidget {
       //
       // УСТАНОВКА СТАТУСА
       //
-      var statusName = bloc.statuses
-          .firstWhere((Status e) => e.label == event.statusLabel)
-          .name;
+      String statusName;
+      if (bloc.statuses == null || bloc.statuses.isEmpty) {
+        statusName = event.statusLabel;
+      } else {
+        statusName = bloc.statuses
+            .firstWhere((Status e) => e.label == event.statusLabel)
+            .name;
+      }
       var userDate = '';
       if (event.userDate != null) {
         userDate =
-            ', факт.время: ${event.userDate.formatDate('dd.MM.yy HH:mm')}';
+            ', пользовательское время: ${event.userDate.formatDate('dd.MM.yy HH:mm')}';
       }
       var comment = '';
       if (event.comment != null && event.comment.isNotEmpty) {
@@ -148,9 +148,14 @@ class HistoryScreenItem extends StatelessWidget {
       //
       // ВЫСТАВЛЕНИЕ ОЦЕНКИ
       //
-      var ratingName = bloc.ratings
-          .firstWhere((Rating e) => e.label == event.ratingLabel)
-          .name;
+      String ratingName;
+      if (bloc.ratings == null || bloc.ratings.isEmpty) {
+        ratingName = event.ratingLabel;
+      } else {
+        ratingName = bloc.ratings
+            .firstWhere((Rating e) => e.label == event.ratingLabel)
+            .name;
+      }
       var presetComment = '';
       if (event.ratingComment != null) {
         presetComment = event.ratingComment;
@@ -168,7 +173,8 @@ class HistoryScreenItem extends StatelessWidget {
           unionComment = ', комментарии: $comment';
         }
       }
-      var action = event.parentId == null ? 'выставил оценку' : 'внёс изменения: оценка';
+      var action =
+          event.parentId == null ? 'выставил оценку' : 'внёс изменения: оценка';
       result = '$action "$ratingName"$unionComment';
     }
     return result;
@@ -206,5 +212,21 @@ class HistoryScreenItem extends StatelessWidget {
       },
 //          elevation: 25,
     );
+  }
+
+  Widget _getDateLabelItem({Color bgColor}) {
+    bgColor ??= Colors.blue;
+    return Padding(
+        padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: Center(
+            child: Container(
+                decoration: BoxDecoration(
+                  color: bgColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Text(eventItem.labelText,
+                        style: TextStyle(fontSize: 14))))));
   }
 }

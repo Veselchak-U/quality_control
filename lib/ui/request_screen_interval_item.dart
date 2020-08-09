@@ -20,6 +20,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
       child: Padding(
           padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -36,13 +37,18 @@ class RequestScreenIntervalItem extends StatelessWidget {
                         'Заявка: ${item.number}',
                         style: TextStyle(color: Colors.white),
                       )),
-                  Spacer(),
-                  Padding(
-                      padding: EdgeInsets.only(right: 8),
-                      child: Text(item.interval.dateBegin.dateForHuman())),
-                  Text(
-                    item.intervalTimes(),
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      alignment: WrapAlignment.end,
+                      children: [
+                        Text(item.interval.dateBegin.formatDate('dd.MM.yy')),
+                        Text(item.intervalTimes(),
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
                 ],
               ),

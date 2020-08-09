@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/quality_bloc.dart';
@@ -46,8 +45,6 @@ class _QualityScreenState extends State<QualityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var primaryColor = Theme.of(context).primaryColor;
-
     var bottomNavigationBar = BottomNavigationBar(
       currentIndex: _bloc.bottomNavigationBarIndex,
       onTap: (int index) => _bloc.onTapBottomNavigationBar(index),
@@ -76,6 +73,35 @@ class _QualityScreenState extends State<QualityScreen> {
       ],
     );
 
+    if (_bloc.ratingReferences == null || _bloc.ratingReferences.isEmpty) {
+      return Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text(
+              'Заявка № ${_bloc.request.number}',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          body: Container(
+              color: Colors.white,
+              child: Center(
+                  child: Text('Не заполнен справочник оценок',
+                      style: TextStyle(fontSize: 24, color: Colors.black38)))),
+          bottomNavigationBar: bottomNavigationBar);
+    }
+
+    var deviceInfo = MediaQuery.of(context);
+    var screenHPadding = 32.0;
+    var ratingStarSize = 36.0;
+    var ratingStarSpacing = (deviceInfo.size.width -
+            (screenHPadding * 2) -
+            (ratingStarSize * _bloc.ratingReferences.length)) /
+        (_bloc.ratingReferences.length - 1);
+    ratingStarSpacing = ratingStarSpacing > 16 ? 16 : ratingStarSpacing;
+    ratingStarSpacing = ratingStarSpacing < 0 ? 0 : ratingStarSpacing;
+
+    var primaryColor = Theme.of(context).primaryColor;
+
     var rowDivider = SizedBox(
       height: 8,
     );
@@ -99,7 +125,8 @@ class _QualityScreenState extends State<QualityScreen> {
             color: Colors.white30,
             child: SingleChildScrollView(
               child: Padding(
-                  padding: EdgeInsets.fromLTRB(32, 8, 32, 8),
+                  padding:
+                      EdgeInsets.fromLTRB(screenHPadding, 8, screenHPadding, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -217,7 +244,7 @@ class _QualityScreenState extends State<QualityScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
-                        height: 8,
+                        height: 16,
                       ),
                       Center(
                         child: Column(
@@ -234,13 +261,14 @@ class _QualityScreenState extends State<QualityScreen> {
                                 rating: isUpdateMode
                                     ? _bloc.selectedRatingIndex + 1
                                     : 0,
-                                size: 32,
+                                size: ratingStarSize,
                                 isReadOnly: false,
                                 defaultIconData: Icons.star_border,
                                 filledIconData: Icons.star,
                                 color: primaryColor,
                                 borderColor: primaryColor,
-                                spacing: 8),
+                                spacing:
+                                    ratingStarSpacing /*isThinDisplay ? 0 : 16*/),
                             SizedBox(
                               height: 8,
                             ),
@@ -251,9 +279,7 @@ class _QualityScreenState extends State<QualityScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 16,
-                      ),
+                      rowDivider,
                       Text(
                         'Комментарий к оценке:',
                         style: TextStyle(fontWeight: FontWeight.bold),

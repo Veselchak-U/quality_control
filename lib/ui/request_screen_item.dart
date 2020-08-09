@@ -19,6 +19,7 @@ class RequestScreenItem extends StatelessWidget {
       child: Padding(
           padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -35,13 +36,27 @@ class RequestScreenItem extends StatelessWidget {
                         'Заявка: ${request.number}',
                         style: TextStyle(color: Colors.white),
                       )),
-                  Spacer(),
-                  Padding(
-                      padding: EdgeInsets.only(right: 8),
-                      child: Text(
-                        '${request.dateFrom.dateForHuman()} - ${request.dateTo.dateForHuman()}',
+                  SizedBox(width: 8),
+                  Expanded(
+                      child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+//                    spacing: 8,
+                    alignment: WrapAlignment.end,
+                    children: [
+                      Text(
+                        request.dateFrom.formatDate('dd.MM.yy'),
                         style: TextStyle(fontWeight: FontWeight.bold),
-                      )),
+                      ),
+//                      Text(
+//                        ' - ',
+//                        style: TextStyle(fontWeight: FontWeight.bold),
+//                      ),
+                      Text(
+                        ' - ${request.dateTo.formatDate('dd.MM.yy')}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  )),
                 ],
               ),
               SizedBox(

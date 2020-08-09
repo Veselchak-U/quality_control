@@ -28,9 +28,9 @@ class _RequestScreenState extends State<RequestScreen>
   @override
   Widget build(BuildContext context) {
     final tabs = <Tab>[
-      Tab(text: 'РАНЕЕ'),
-      Tab(text: 'СЕГОДНЯ'),
-      Tab(text: 'ДАЛЕЕ'),
+      Tab(child: Text('РАНЕЕ', overflow: TextOverflow.ellipsis)),
+      Tab(child: Text('СЕГОДНЯ', overflow: TextOverflow.ellipsis)),
+      Tab(child: Text('ДАЛЕЕ', overflow: TextOverflow.ellipsis)),
     ];
 
     final tabBar = TabBar(

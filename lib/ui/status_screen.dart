@@ -82,6 +82,23 @@ class _StatusScreenState extends State<StatusScreen> {
       ],
     );
 
+    if (_bloc.statusReferences == null || _bloc.statusReferences.isEmpty) {
+      return Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text(
+              'Заявка № ${_bloc.request.number}',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          body: Container(
+              color: Colors.white,
+              child: Center(
+                  child: Text('Не заполнен справочник статусов',
+                      style: TextStyle(fontSize: 24, color: Colors.black38)))),
+          bottomNavigationBar: bottomNavigationBar);
+    }
+
     var rowDivider = SizedBox(
       height: 8,
     );
