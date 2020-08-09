@@ -54,13 +54,15 @@ class StatusBloc extends IBloc {
       selectedInterval = event.workInterval;
       selectedStatus =
           statusReferences.firstWhere((e) => e.label == event.statusLabel);
-      selectedFactDate = event.userDate.trunc();
-      selectedFactTime =
-          TimeOfDay(hour: event.userDate.hour, minute: event.userDate.minute);
+      if (event.userDate != null) {
+        selectedFactDate = event.userDate.trunc();
+        selectedFactTime =
+            TimeOfDay(hour: event.userDate.hour, minute: event.userDate.minute);
+      }
       inputtedComments = event.comment ?? '';
     } else {
       // режим добавления
-      intervalDates = request.getDatesFromIntervals();
+      intervalDates = request.getDatesFromIntervals(limitToday: true);
       selectedDate = DateTime.now().trunc(); // TODO(dyv): брать ближайшую дату
       intervalsByDate = request.getIntervalsByDate(date: selectedDate);
       selectedInterval =

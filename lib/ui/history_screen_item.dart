@@ -181,6 +181,24 @@ class HistoryScreenItem extends StatelessWidget {
   }
 
   void _showBottomSheet() {
+    Widget editListTile;
+    if (eventItem.isAlien || eventItem.isReadOnly) {
+      editListTile = ListTile(
+        leading: Icon(Icons.edit, color: Colors.black38),
+        title: Text(
+            'Недоступно (${eventItem.isAlien ? "чужая заявка" : "запрет корректировки оценки"})',
+            style: TextStyle(color: Colors.black38)),
+      );
+    } else {
+      editListTile = ListTile(
+        leading: Icon(Icons.edit),
+        title: Text('Корректировка события'),
+        onTap: () {
+          bloc.onTapEditBottomMenu(event: eventItem.event);
+        },
+      );
+    }
+
     bloc.scaffoldKey.currentState.showBottomSheet<void>(
       (BuildContext context) {
         return Container(
@@ -194,13 +212,7 @@ class HistoryScreenItem extends StatelessWidget {
           ),
           child: Wrap(
             children: [
-              ListTile(
-                leading: Icon(Icons.edit),
-                title: Text('Корректировка события'),
-                onTap: () {
-                  bloc.onTapEditBottomMenu(event: eventItem.event);
-                },
-              ),
+              editListTile,
               ListTile(
                 leading: Icon(Icons.close),
                 title: Text('Отмена'),

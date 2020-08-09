@@ -50,9 +50,9 @@ class ReferenceBooks {
     Rating(
         label: '4',
         name: 'Хорошо',
-        presetComments: [],
+        presetComments: ['Всё штатно', 'Предложение по улучшению'],
         isCommentRequired: false,
-        isCanUpdate: true),
+        isCanUpdate: false),
     Rating(
         label: '5',
         name: 'Очень хорошо',

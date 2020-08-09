@@ -2,6 +2,7 @@ import 'package:fimber/fimber.dart';
 import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/event_item.dart';
+import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/request_interval_item.dart';
@@ -105,7 +106,8 @@ class StreamService {
             var eventItem = EventItem(
                 type: EventItemType.EVENT,
                 event: e,
-                isAlien: _isAlienEvent(event: e));
+                isAlien: _isAlienEvent(event: e),
+                isReadOnly: _isReadOnlyEvent(event: e));
             result.add(eventItem);
           });
         }
@@ -115,12 +117,25 @@ class StreamService {
   }
 
   bool _isAlienEvent({Event event}) {
-    bool result;
+    bool result = true;
     var currentUserId = _appState.user.id;
     if (event.user.id == currentUserId) {
       result = false;
-    } else {
-      result = true;
+    }
+    return result;
+  }
+
+  bool _isReadOnlyEvent({Event event}) {
+    bool result = false;
+    if (event.eventType == EventType.SET_RATING) {
+      var ratings = _appState.ratingReferences;
+      if (ratings != null) {
+        var index =
+            ratings.indexWhere((Rating e) => e.label == event.ratingLabel);
+        if (index != -1 && ratings[index].isCanUpdate == false) {
+          result = true;
+        }
+      }
     }
     return result;
   }

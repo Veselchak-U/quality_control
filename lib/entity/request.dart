@@ -53,14 +53,25 @@ class Request {
     return result;
   }
 
-  List<DateTime> getDatesFromIntervals() {
+  List<DateTime> getDatesFromIntervals({bool limitToday}) {
+    limitToday ??= false;
     List<DateTime> result = [];
 
     if (intervals != null && intervals.isNotEmpty) {
       Set<DateTime> set = <DateTime>{};
-      intervals.forEach((WorkInterval i) {
-        set.add(i.dateBegin.trunc());
-      });
+      if (limitToday) {
+        var today = DateTime.now().trunc();
+        intervals.forEach((WorkInterval i) {
+          if (i.dateBegin.trunc().compareTo(today) <= 0) {
+            set.add(i.dateBegin.trunc());
+          }
+        });
+      } else {
+        intervals.forEach((WorkInterval i) {
+          set.add(i.dateBegin.trunc());
+        });
+      }
+
       List<DateTime> sortedList = set.toList();
       sortedList.sort();
       result = sortedList;
@@ -83,8 +94,6 @@ class Request {
     }
     return result;
   }
-
-
 
 //  Map<DateTime, String> getDatesFromIntervals() {
 //    Map<DateTime, String> result = {};

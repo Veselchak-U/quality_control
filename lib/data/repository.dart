@@ -45,12 +45,13 @@ class Repository {
     _requests = await _dataSource.loadRequests(user: _currentUser);
 
     // Инициализируем текущее состояние приложения
-    setAppState(
-        newAppState: AppState(
-            requestFilterByDate: RequestFilterByDate.TODAY,
-            requestFilterByText: '',
-            user: _currentUser,
-            bottomNavigationBarIndex: 1));
+    // TODO(dyv): get it from hive
+    _appState.requestFilterByDate = RequestFilterByDate.TODAY;
+    _appState.requestFilterByText = '';
+    _appState.user = _currentUser;
+    _appState.bottomNavigationBarIndex = 1;
+    _appState.statusReferences = statusReferences;
+    _appState.ratingReferences = ratingReferences;
     _streamService.appStateStream.add(_appState);
 
     // Рассылаем зачитанные данные
@@ -90,6 +91,7 @@ class Repository {
     if (newAppState.bottomNavigationBarIndex != null) {
       _appState.bottomNavigationBarIndex = newAppState.bottomNavigationBarIndex;
     }
+
     // refresh data
     _streamService.appStateStream.add(_appState);
     if (needRefreshData) {

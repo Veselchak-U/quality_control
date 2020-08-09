@@ -63,7 +63,7 @@ class QualityBloc extends IBloc {
       inputtedComments = event.comment ?? '';
     } else {
       // режим добавления
-      intervalDates = request.getDatesFromIntervals();
+      intervalDates = request.getDatesFromIntervals(limitToday: true);
       selectedDate = DateTime.now().trunc(); // TODO(dyv): брать ближайшую дату
       intervalsByDate = request.getIntervalsByDate(date: selectedDate);
       selectedInterval =

@@ -1,4 +1,7 @@
 import 'package:quality_control/entity/event.dart';
+import 'package:quality_control/entity/rating.dart';
+import 'package:quality_control/entity/request.dart';
+import 'package:quality_control/entity/status.dart';
 import 'package:quality_control/entity/user.dart';
 
 class AppState {
@@ -10,7 +13,10 @@ class AppState {
       this.intervalId,
       this.event,
       this.listPresentation,
-      this.bottomNavigationBarIndex});
+      this.bottomNavigationBarIndex,
+      this.statusReferences,
+      this.ratingReferences,
+      this.requests});
 
   RequestFilterByDate requestFilterByDate; // фильтр заявок по дате
   String requestFilterByText; // фильтр заявок по тексту
@@ -20,6 +26,9 @@ class AppState {
   Event event; // корректируемое событие из заявки
   ListPresentation listPresentation; // текущий режим показа списка
   int bottomNavigationBarIndex; // текущая вкладка внизу
+  List<Status> statusReferences; // справочник статусов (для сохранения)
+  List<Rating> ratingReferences; // справочник оценок (для сохранения)
+  List<Request> requests; // текущие заявки (для сохранения)
 }
 
 enum RequestFilterByDate { BEFORE, TODAY, AFTER }
