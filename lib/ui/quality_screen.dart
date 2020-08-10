@@ -113,10 +113,7 @@ class _QualityScreenState extends State<QualityScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          'Заявка № ${_bloc.request.number}',
-          textAlign: TextAlign.center,
-        ),
+        title: Text('Заявка № ${_bloc.request.number}'),
       ),
       body: Form(
         key: _formKey,

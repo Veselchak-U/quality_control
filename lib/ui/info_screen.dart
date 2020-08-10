@@ -54,10 +54,7 @@ class _InfoScreenState extends State<InfoScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          'Заявка № ${_request.number}',
-          textAlign: TextAlign.center,
-        ),
+        title: Text('Заявка № ${_request.number}'),
       ),
       body: Container(
         color: Colors.white30,
@@ -67,87 +64,43 @@ class _InfoScreenState extends State<InfoScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Даты:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Text(
-                      '${_request.dateFrom.dateForHuman()} - ${_request.dateTo.dateForHuman()}')),
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                'Интервалы работы:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Text(_request.allIntervalsToString())),
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                'Откуда:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Text(_request.routeFrom)),
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                'Куда:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Text(_request.routeTo)),
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                'Описание:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Text(_request.routeDescription)),
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                'Подразделение:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Text(_request.customer)),
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                'Представитель:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              _textBlock(
+                  header: 'Даты:',
+                  body:
+                      '${_request.dateFrom.dateForHuman()} - ${_request.dateTo.dateForHuman()}'),
+              _textBlock(
+                  header: 'Интервалы работы:',
+                  body: _request.allIntervalsToString()),
+              _textBlock(header: 'Откуда:', body: _request.routeFrom),
+              _textBlock(header: 'Куда:', body: _request.routeTo),
+              _textBlock(header: 'Описание:', body: _request.routeDescription),
+              _textBlock(header: 'Подразделение:', body: _request.customer),
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Padding(
-                      padding: EdgeInsets.only(left: 16),
-                      child: Text(_request.customerDelegat.toFullFIO())),
-                  Spacer(),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Представитель:',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text(_request.customerDelegat.toFullFIO()))
+                      ],
+                    ),
+                  ),
                   if (_request.customerDelegat.phone.isEmpty)
                     SizedBox.shrink()
                   else
-                    MaterialButton(
-                      minWidth: 50,
-                      color: Theme.of(context).accentColor,
-                      onPressed: _bloc.callToCustomerDelegat,
-                      child: Icon(
-                        Icons.phone,
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).accentColor,
+                          shape: BoxShape.circle),
+                      child: IconButton(
+                        icon: Icon(Icons.phone),
                         color: Colors.white,
+                        onPressed: _bloc.callToCustomerDelegat,
                       ),
                     )
                 ],
@@ -155,28 +108,24 @@ class _InfoScreenState extends State<InfoScreen> {
               SizedBox(
                 height: 8,
               ),
-              Text(
-                'Комментарий:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Text(_request.comment)),
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                'Примечание:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Text(_request.note)),
+              _textBlock(header: 'Комментарий:', body: _request.comment),
+              _textBlock(header: 'Примечание:', body: _request.note)
             ],
           ),
         )),
       ),
       bottomNavigationBar: bottomNavigationBar,
+    );
+  }
+
+  Widget _textBlock({String header, String body}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(header, style: TextStyle(fontWeight: FontWeight.bold)),
+        Padding(padding: EdgeInsets.only(left: 16), child: Text(body)),
+        SizedBox(height: 8),
+      ],
     );
   }
 }

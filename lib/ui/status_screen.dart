@@ -88,10 +88,7 @@ class _StatusScreenState extends State<StatusScreen> {
       return Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            title: Text(
-              'Заявка № ${_bloc.request.number}',
-              textAlign: TextAlign.center,
-            ),
+            title: Text('Заявка № ${_bloc.request.number}'),
           ),
           body: Container(
               color: Colors.white,
@@ -294,16 +291,11 @@ class _StatusScreenState extends State<StatusScreen> {
                       ),
                       headerDivider,
                       Container(
-//                        alignment: Alignment.topLeft,
-//                        padding: EdgeInsets.only(right: 32),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-//                            Spacer(),
 //                            Text('дата'),
-//                            SizedBox(
-//                              width: 8,
-//                            ),
+//                            SizedBox(width: 8),
                             Container(
                               width: 100,
                               child: TextFormField(

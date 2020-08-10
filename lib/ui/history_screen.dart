@@ -55,20 +55,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          'Заявка № ${_bloc.currentRequest.number}',
-          textAlign: TextAlign.center,
-        ),
+        title: Text('Заявка № ${_bloc.currentRequest.number}'),
       ),
       body: StreamBuilder(
         stream: _bloc.outEventItems,
-        builder: (BuildContext context, AsyncSnapshot<List<EventItem>> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<List<EventItem>> snapshot) {
           if (snapshot.data == null || snapshot.data.isEmpty) {
             return Center(
                 child: Text(
-                  'Событий нет',
-                  style: TextStyle(fontSize: 20, color: Colors.black38),
-                ));
+              'Событий нет',
+              style: TextStyle(fontSize: 20, color: Colors.black38),
+            ));
           } else {
             return Scrollbar(
               child: ListView.builder(
