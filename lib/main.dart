@@ -12,9 +12,7 @@ void main() {
 
 void _clearWebCache() {
   if (UniversalPlatform.isWeb) {
-//    var appDir = getTemporaryDirectory();
-//    WebV
-//    print(appDir);
+    print('Hello from Web!');
   }
 }
 

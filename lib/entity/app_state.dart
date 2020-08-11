@@ -8,6 +8,7 @@ class AppState {
   AppState(
       {this.requestFilterByDate,
       this.requestFilterByText,
+      this.eventFilterByChain,
       this.user,
       this.requestId,
       this.intervalId,
@@ -20,6 +21,7 @@ class AppState {
 
   RequestFilterByDate requestFilterByDate; // фильтр заявок по дате
   String requestFilterByText; // фильтр заявок по тексту
+  String eventFilterByChain; // фильтр событий по цепочке
   User user; // текущий пользователь
   String requestId; // текущая заявка
   String intervalId; // текущий интервал

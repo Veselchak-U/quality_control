@@ -33,7 +33,7 @@ class StatusBloc extends IBloc {
   String inputtedComments;
   AppState _appState;
   bool isUpdateMode = false; // режим корректировки
-  Event event; // корректируемое событие
+  Event parentEvent; // корректируемое событие
 
   final int bottomNavigationBarIndex = 2;
   BuildContext context;
@@ -47,19 +47,20 @@ class StatusBloc extends IBloc {
     if (_appState.event != null) {
       // режим корректировки
       isUpdateMode = true;
-      event = _appState.event;
+      parentEvent = _appState.event;
 //      intervalDates = <DateTime>[event.dateRequest];
-      selectedDate = event.dateRequest;
+      selectedDate = parentEvent.dateRequest;
 //      intervalsByDate = <WorkInterval>[event.workInterval];
-      selectedInterval = event.workInterval;
-      selectedStatus =
-          statusReferences.firstWhere((e) => e.label == event.statusLabel);
-      if (event.userDate != null) {
-        selectedFactDate = event.userDate.trunc();
-        selectedFactTime =
-            TimeOfDay(hour: event.userDate.hour, minute: event.userDate.minute);
+      selectedInterval = parentEvent.workInterval;
+      selectedStatus = statusReferences
+          .firstWhere((e) => e.label == parentEvent.statusLabel);
+      if (parentEvent.userDate != null) {
+        selectedFactDate = parentEvent.userDate.trunc();
+        selectedFactTime = TimeOfDay(
+            hour: parentEvent.userDate.hour,
+            minute: parentEvent.userDate.minute);
       }
-      inputtedComments = event.comment ?? '';
+      inputtedComments = parentEvent.comment ?? '';
     } else {
       // режим добавления
       intervalDates = request.getDatesFromIntervals(limitToday: true);
@@ -112,7 +113,7 @@ class StatusBloc extends IBloc {
     }
 
     var newEvent = Event(
-        parentId: isUpdateMode ? event.id : null,
+        rootId: isUpdateMode ? parentEvent.rootId ?? parentEvent.id : null,
         systemDate: DateTime.now(),
         userDate: userDate,
         user: _repository.appState.user,
@@ -121,7 +122,11 @@ class StatusBloc extends IBloc {
         eventType: EventType.SET_STATUS,
         statusLabel: selectedStatus.label,
         comment: inputtedComments);
-    _repository.addEvent(requestId: request.id, event: newEvent);
+
+    _repository.addEvent(
+        requestId: request.id,
+        newEvent: newEvent,
+        parentEvent: isUpdateMode ? parentEvent : null);
 
     onTapBottomNavigationBar(1);
     //    Navigator.pop(context);

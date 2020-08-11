@@ -6,7 +6,8 @@ import 'package:quality_control/util/utils.dart';
 class Event {
   Event(
       {String id,
-      this.parentId,
+      this.rootId,
+      this.childId,
       this.systemDate,
       this.userDate,
       this.user,
@@ -20,7 +21,8 @@ class Event {
       : id = id ?? Utils.nextEventId.toString();
 
   String id;
-  String parentId; // id корректируемого (первого в цепочке) события
+  String rootId; // id первого события в цепочке
+  String childId; // id корректирующего события
   DateTime systemDate; // время системное
   DateTime userDate; // время указанное пользователем
   User user; // пользователь, создавший событие

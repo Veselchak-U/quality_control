@@ -73,7 +73,7 @@ class StreamService {
         .map(_convertRequestToRequestIntervalItem)
         .map(_filterRequestsIntervalItem)
         .listen(requestIntervalItemsStream.add);
-    requestsStream.map(_getCurrentEventItems).listen(eventItemsStream.add);
+    requestsStream.map(_filterCurrentEventItems).listen(eventItemsStream.add);
 
     appStateStream.listen((AppState value) {
       _appState = value;
@@ -83,33 +83,61 @@ class StreamService {
     return true;
   }
 
-  List<EventItem> _getCurrentEventItems(List<Request> requests) {
+  List<EventItem> _filterCurrentEventItems(List<Request> requests) {
     List<EventItem> result = [];
     var currentRequestId = _appState?.requestId;
     if (currentRequestId != null) {
       var index = requests.indexWhere((Request r) => r.id == currentRequestId);
       if (index != -1) {
-        var events = requests[index].events;
+        List<Event> events = requests[index].events;
         if (events != null) {
-          // DATE_LABEL
-          var currentDate = events[0].systemDate.trunc();
-          result.add(_getDateLabelEvent(date: currentDate));
-
-          events.forEach((Event e) {
+          // filter by chain
+          var filterEvents = <Event>[];
+          var rootId = _appState?.eventFilterByChain;
+          var isNotChainShow = rootId == null || rootId.isEmpty;
+          if (isNotChainShow) {
+            filterEvents = events;
+          } else {
+            events.forEach((Event e) {
+              if (rootId == e.rootId || rootId == e.id) {
+                filterEvents.add(e);
+              }
+            });
+          }
+          // convert to eventItem
+          if (filterEvents != null) {
             // DATE_LABEL
-            var nextDate = e.systemDate.trunc();
-            if (nextDate != currentDate) {
-              currentDate = nextDate;
-              result.add(_getDateLabelEvent(date: currentDate));
-            }
-            // EVENT
-            var eventItem = EventItem(
-                type: EventItemType.EVENT,
-                event: e,
-                isAlien: _isAlienEvent(event: e),
-                isReadOnly: _isReadOnlyEvent(event: e));
-            result.add(eventItem);
-          });
+            var currentDate = filterEvents[0].systemDate.trunc();
+            result.add(_getDateLabelEvent(date: currentDate));
+
+            filterEvents.forEach((Event e) {
+              // DATE_LABEL
+              var nextDate = e.systemDate.trunc();
+              if (nextDate != currentDate) {
+                currentDate = nextDate;
+                result.add(_getDateLabelEvent(date: currentDate));
+              }
+              // EVENT
+              EventItem eventItem;
+              if (isNotChainShow && e.childId == null) {
+                eventItem = EventItem(
+                    type: EventItemType.EVENT,
+                    event: e,
+                    isAlien: _isAlienEvent(event: e),
+                    isReadOnly: _isReadOnlyEvent(event: e),
+                    isHaveHistory: e.rootId != null || e.childId != null);
+                result.add(eventItem);
+              } else if (!isNotChainShow) {
+                eventItem = EventItem(
+                    type: EventItemType.EVENT,
+                    event: e,
+                    isAlien: _isAlienEvent(event: e),
+                    isReadOnly: _isReadOnlyEvent(event: e),
+                    isHaveHistory: true);
+                result.add(eventItem);
+              }
+            });
+          }
         }
       }
     }

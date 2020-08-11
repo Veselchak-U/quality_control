@@ -8,9 +8,9 @@ import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
 
 class HistoryScreenItem extends StatelessWidget {
-  HistoryScreenItem(this.eventItem, this.bloc);
+  HistoryScreenItem(this.item, this.bloc);
 
-  final EventItem eventItem;
+  final EventItem item;
   final HistoryBloc bloc;
   final TextStyle headerTextStyle =
       TextStyle(fontWeight: FontWeight.bold, fontSize: 14);
@@ -20,13 +20,13 @@ class HistoryScreenItem extends StatelessWidget {
     var primaryColor = Theme.of(context).primaryColor;
     Widget result;
 
-    if (eventItem.type == EventItemType.EVENT) {
+    if (item.type == EventItemType.EVENT) {
       result = _getEventItem();
-    } else if (eventItem.type == EventItemType.DATE_LABEL) {
+    } else if (item.type == EventItemType.DATE_LABEL) {
       result = _getDateLabelItem(bgColor: primaryColor);
-    } else if (eventItem.type == EventItemType.UNREAD_LABEL) {
+    } else if (item.type == EventItemType.UNREAD_LABEL) {
       // TODO(dyv): допилить
-      result = Text('Метка непрочитано: ${eventItem.labelText}');
+      result = Text('Метка непрочитано: ${item.labelText}');
     } else {
       print('Unknown EventItemType');
     }
@@ -35,8 +35,7 @@ class HistoryScreenItem extends StatelessWidget {
 
   Widget _getEventItem() {
     return Container(
-      alignment:
-          eventItem.isAlien ? Alignment.centerLeft : Alignment.centerRight,
+      alignment: item.isAlien ? Alignment.centerLeft : Alignment.centerRight,
       padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: FractionallySizedBox(
         widthFactor: 0.9,
@@ -44,15 +43,14 @@ class HistoryScreenItem extends StatelessWidget {
           onTap: _showBottomSheet,
           child: Container(
             decoration: BoxDecoration(
-                color: eventItem.isAlien ? Colors.yellow[50] : Colors.green[50],
+                color: item.isAlien ? Colors.yellow[50] : Colors.green[50],
                 border: Border.all(),
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(8),
                     topRight: Radius.circular(8),
-                    bottomLeft: eventItem.isAlien
-                        ? Radius.circular(0)
-                        : Radius.circular(8),
-                    bottomRight: eventItem.isAlien
+                    bottomLeft:
+                        item.isAlien ? Radius.circular(0) : Radius.circular(8),
+                    bottomRight: item.isAlien
                         ? Radius.circular(8)
                         : Radius.circular(0))),
             child: Padding(
@@ -68,14 +66,22 @@ class HistoryScreenItem extends StatelessWidget {
                           spacing: 8,
                           alignment: WrapAlignment.start,
                           children: [
-                            Text(eventItem.event.user.getUserRoleName(),
+                            if (item.isHaveHistory)
+                              Icon(
+                                Icons.edit,
+                                size: 18,
+                                color: Colors.black38,
+                              )
+                            else
+                              SizedBox.shrink(),
+                            Text(item.event.user.getUserRoleName(),
                                 style: headerTextStyle),
-                            Text(eventItem.event.user.toShortFIO(),
+                            Text(item.event.user.toShortFIO(),
                                 style: headerTextStyle)
                           ],
                         ),
                       ),
-                      Text(eventItem.event.systemDate.formatDate('HH:mm'),
+                      Text(item.event.systemDate.formatDate('HH:mm'),
 //                            overflow: TextOverflow.ellipsis,
                           style: headerTextStyle),
                     ],
@@ -99,8 +105,8 @@ class HistoryScreenItem extends StatelessWidget {
 
   String _getPeriodText() {
     String result = '';
-    DateTime date = eventItem.event.dateRequest;
-    WorkInterval interval = eventItem.event.workInterval;
+    DateTime date = item.event.dateRequest;
+    WorkInterval interval = item.event.workInterval;
 
     if (date == null && interval == null) {
       result = 'Для всей заявки';
@@ -118,7 +124,7 @@ class HistoryScreenItem extends StatelessWidget {
 
   String _getEventText() {
     String result = '';
-    Event event = eventItem.event;
+    Event event = item.event;
     EventType eventType = event.eventType;
 
     if (eventType == EventType.SET_STATUS) {
@@ -142,7 +148,7 @@ class HistoryScreenItem extends StatelessWidget {
       if (event.comment != null && event.comment.isNotEmpty) {
         comment = ', комментарии: ${event.comment}';
       }
-      var action = event.parentId == null ? 'установил' : 'внёс изменения:';
+      var action = event.rootId == null ? 'установил' : 'внёс изменения:';
       result = '$action статус "$statusName"$userDate$comment';
     } else if (eventType == EventType.SET_RATING) {
       //
@@ -174,7 +180,7 @@ class HistoryScreenItem extends StatelessWidget {
         }
       }
       var action =
-          event.parentId == null ? 'выставил оценку' : 'внёс изменения: оценка';
+          event.rootId == null ? 'выставил оценку' : 'внёс изменения: оценка';
       result = '$action "$ratingName"$unionComment';
     }
     return result;
@@ -182,11 +188,11 @@ class HistoryScreenItem extends StatelessWidget {
 
   void _showBottomSheet() {
     Widget editListTile;
-    if (eventItem.isAlien || eventItem.isReadOnly) {
+    if (item.isAlien || item.isReadOnly) {
       editListTile = ListTile(
         leading: Icon(Icons.edit, color: Colors.black38),
         title: Text(
-            'Недоступно (${eventItem.isAlien ? "чужая заявка" : "запрет корректировки оценки"})',
+            'Недоступно (${item.isAlien ? "чужая заявка" : "запрет корректировки оценки"})',
             style: TextStyle(color: Colors.black38)),
       );
     } else {
@@ -194,7 +200,7 @@ class HistoryScreenItem extends StatelessWidget {
         leading: Icon(Icons.edit),
         title: Text('Корректировка события'),
         onTap: () {
-          bloc.onTapEditBottomMenu(event: eventItem.event);
+          bloc.onTapEditBottomMenu(event: item.event);
         },
       );
     }
@@ -213,6 +219,16 @@ class HistoryScreenItem extends StatelessWidget {
           child: Wrap(
             children: [
               editListTile,
+              if (item.isHaveHistory)
+                ListTile(
+                  leading: Icon(Icons.linear_scale),
+                  title: Text('Цепочка изменений'),
+                  onTap: () {
+                    bloc.onTapShowChainBottomMenu(event: item.event);
+                  },
+                )
+              else
+                SizedBox.shrink(),
               ListTile(
                 leading: Icon(Icons.close),
                 title: Text('Отмена'),
@@ -238,7 +254,7 @@ class HistoryScreenItem extends StatelessWidget {
                 ),
                 child: Padding(
                     padding: EdgeInsets.all(8),
-                    child: Text(eventItem.labelText,
+                    child: Text(item.labelText,
                         style: TextStyle(fontSize: 14))))));
   }
 }

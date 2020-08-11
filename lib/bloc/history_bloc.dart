@@ -44,14 +44,14 @@ class HistoryBloc extends IBloc {
   }
 
   void onTapEditBottomMenu({Event event}) {
+    _repository.setAppState(newAppState: AppState(event: event));
+
     Widget Function() nextScreen;
     if (event.eventType == EventType.SET_STATUS) {
       nextScreen = _screenBuilder.getStatusScreenBuilder();
     } else if (event.eventType == EventType.SET_RATING) {
       nextScreen = _screenBuilder.getQualityScreenBuilder();
     }
-    _repository.setAppState(
-        newAppState: AppState(event: event));
 
     Navigator.pushReplacement(
         context,
@@ -59,6 +59,18 @@ class HistoryBloc extends IBloc {
             pageBuilder: (BuildContext context, Animation<double> animation,
                     Animation<double> secondaryAnimation) =>
                 nextScreen()));
+  }
+
+  void onTapShowChainBottomMenu({Event event}) {
+    var currentRootId = _appState.eventFilterByChain;
+    if (currentRootId == null || currentRootId.isEmpty) {
+      _repository.setAppState(
+          newAppState:
+              AppState(eventFilterByChain: event.rootId ?? event.id));
+    } else {
+      _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
+    }
+    Navigator.pop(context);
   }
 
   void onTapExitBottomMenu() {
@@ -91,6 +103,7 @@ class HistoryBloc extends IBloc {
 
   @override
   void dispose() {
+    _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
     _log.i('dispose');
   }
 }

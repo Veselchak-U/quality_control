@@ -31,7 +31,7 @@ class _StatusScreenState extends State<StatusScreen> {
     _bloc.context = context;
     isUpdateMode = _bloc.isUpdateMode;
     if (isUpdateMode) {
-      event = _bloc.event;
+      event = _bloc.parentEvent;
       if (_bloc.selectedFactDate != null) {
         dateFieldController.text = _bloc.selectedFactDate.dateForHuman() ?? '';
       }

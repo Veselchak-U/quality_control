@@ -35,7 +35,7 @@ class QualityBloc extends IBloc {
   String inputtedComments;
   AppState _appState;
   bool isUpdateMode = false; // режим корректировки
-  Event event; // корректируемое событие
+  Event parentEvent; // корректируемое событие
 
   final int bottomNavigationBarIndex = 3;
   BuildContext context;
@@ -49,18 +49,18 @@ class QualityBloc extends IBloc {
     if (_appState.event != null) {
       // режим корректировки
       isUpdateMode = true;
-      event = _appState.event;
+      parentEvent = _appState.event;
 //      intervalDates = <DateTime>[event.dateRequest];
-      selectedDate = event.dateRequest;
+      selectedDate = parentEvent.dateRequest;
 //      intervalsByDate = <WorkInterval>[event.workInterval];
-      selectedInterval = event.workInterval;
-      selectedRating =
-          ratingReferences.firstWhere((e) => e.label == event.ratingLabel);
+      selectedInterval = parentEvent.workInterval;
+      selectedRating = ratingReferences
+          .firstWhere((e) => e.label == parentEvent.ratingLabel);
       selectedRatingIndex = ratingReferences.indexOf(selectedRating).toDouble();
       presetComments = selectedRating.presetComments ?? [];
       isPresetCommentRequired = selectedRating.isCommentRequired ?? false;
-      selectedPresetComment = event.ratingComment;
-      inputtedComments = event.comment ?? '';
+      selectedPresetComment = parentEvent.ratingComment;
+      inputtedComments = parentEvent.comment ?? '';
     } else {
       // режим добавления
       intervalDates = request.getDatesFromIntervals(limitToday: true);
@@ -123,7 +123,7 @@ class QualityBloc extends IBloc {
 
   void onTapAddButton() {
     var newEvent = Event(
-        parentId: isUpdateMode ? event.id : null,
+        rootId: isUpdateMode ? parentEvent.rootId ?? parentEvent.id : null,
         systemDate: DateTime.now(),
         user: _appState.user,
         dateRequest: selectedDate,
@@ -132,7 +132,11 @@ class QualityBloc extends IBloc {
         ratingLabel: selectedRating.label,
         ratingComment: selectedPresetComment,
         comment: inputtedComments);
-    _repository.addEvent(requestId: request.id, event: newEvent);
+
+    _repository.addEvent(
+        requestId: request.id,
+        newEvent: newEvent,
+        parentEvent: isUpdateMode ? parentEvent : null);
 
     onTapBottomNavigationBar(1);
     //    Navigator.pop(context);

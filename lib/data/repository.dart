@@ -75,6 +75,10 @@ class Repository {
       _appState.requestFilterByText = newAppState.requestFilterByText;
       needRefreshData = true;
     }
+    if (newAppState.eventFilterByChain != null) {
+      _appState.eventFilterByChain = newAppState.eventFilterByChain;
+      needRefreshData = true;
+    }
     if (newAppState.user != null) {
       _appState.user = newAppState.user;
     }
@@ -125,11 +129,18 @@ class Repository {
     return result;
   }
 
-  void addEvent({@required String requestId, @required Event event}) {
-    _dataSource.addEvent(requestId: requestId, event: event);
+  void addEvent(
+      {@required String requestId,
+      @required Event newEvent,
+      Event parentEvent}) {
+    if (parentEvent != null) {
+      parentEvent.childId = newEvent.id;
+    }
+    _dataSource.addEvent(
+        requestId: requestId, event: newEvent, parentEvent: parentEvent);
     var request = getRequestById(requestId: requestId);
     request.events ??= [];
-    request.events.add(event);
+    request.events.add(newEvent);
     _onRefreshDataEvent(RefreshDataEvent.REFRESH_REQUESTS);
   }
 }

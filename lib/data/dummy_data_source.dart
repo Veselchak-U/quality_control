@@ -42,7 +42,8 @@ class DummyDataSource implements IDataSource {
   }
 
   @override
-  Future<bool> addEvent({@required String requestId, @required Event event}) {
+  Future<bool> addEvent(
+      {@required String requestId, @required Event event, Event parentEvent}) {
     return Future<bool>.delayed(Duration(milliseconds: 100), () => true);
   }
 }

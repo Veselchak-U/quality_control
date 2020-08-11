@@ -14,5 +14,6 @@ abstract class IDataSource {
 
   Future<List<Rating>> getRatingReferences({@required User user});
 
-  Future<bool> addEvent({@required String requestId, @required Event event});
+  Future<bool> addEvent(
+      {@required String requestId, @required Event event, Event parentEvent});
 }

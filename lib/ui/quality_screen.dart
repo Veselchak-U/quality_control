@@ -30,7 +30,7 @@ class _QualityScreenState extends State<QualityScreen> {
     _bloc.context = context;
     isUpdateMode = _bloc.isUpdateMode;
     if (isUpdateMode) {
-      event = _bloc.event;
+      event = _bloc.parentEvent;
       if (_bloc.inputtedComments.isNotEmpty) {
         commentFieldController.text = _bloc.inputtedComments;
       }
