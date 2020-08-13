@@ -85,7 +85,7 @@ class StreamService {
 
   List<EventItem> _filterCurrentEventItems(List<Request> requests) {
     List<EventItem> result = [];
-    var currentRequestId = _appState?.requestId;
+    var currentRequestId = _appState.requestId;
     if (currentRequestId != null) {
       var index = requests.indexWhere((Request r) => r.id == currentRequestId);
       if (index != -1) {
@@ -93,7 +93,7 @@ class StreamService {
         if (events != null) {
           // filter by chain
           var filterEvents = <Event>[];
-          var rootId = _appState?.eventFilterByChain;
+          var rootId = _appState.eventFilterByChain;
           var isNotChainShow = rootId == null || rootId.isEmpty;
           if (isNotChainShow) {
             filterEvents = events;
@@ -119,6 +119,7 @@ class StreamService {
               }
               // EVENT
               EventItem eventItem;
+              // обычный просмотр событий
               if (isNotChainShow && e.childId == null) {
                 eventItem = EventItem(
                     type: EventItemType.EVENT,
@@ -128,12 +129,13 @@ class StreamService {
                     isHaveHistory: e.rootId != null || e.childId != null);
                 result.add(eventItem);
               } else if (!isNotChainShow) {
+                // просмотр цепочки изменений
                 eventItem = EventItem(
                     type: EventItemType.EVENT,
                     event: e,
                     isAlien: _isAlienEvent(event: e),
                     isReadOnly: _isReadOnlyEvent(event: e),
-                    isHaveHistory: true);
+                    isHaveHistory: e.childId != null);
                 result.add(eventItem);
               }
             });

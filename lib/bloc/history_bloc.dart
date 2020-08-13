@@ -32,6 +32,7 @@ class HistoryBloc extends IBloc {
   final List<Rating> ratings;
   Request currentRequest;
   AppState _appState;
+  bool isChainShow;
 
   final int bottomNavigationBarIndex = 1;
   BuildContext context;
@@ -40,6 +41,8 @@ class HistoryBloc extends IBloc {
 
   void initialize() {
     _appState = _repository.appState;
+    var rootId = _appState.eventFilterByChain;
+    isChainShow = rootId != null && rootId.isNotEmpty;
     currentRequest = _repository.getRequestById(requestId: _appState.requestId);
   }
 
@@ -62,14 +65,13 @@ class HistoryBloc extends IBloc {
   }
 
   void onTapShowChainBottomMenu({Event event}) {
-    var currentRootId = _appState.eventFilterByChain;
-    if (currentRootId == null || currentRootId.isEmpty) {
-      _repository.setAppState(
-          newAppState:
-              AppState(eventFilterByChain: event.rootId ?? event.id));
-    } else {
+    if (isChainShow) {
       _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
+    } else {
+      _repository.setAppState(
+          newAppState: AppState(eventFilterByChain: event.rootId ?? event.id));
     }
+    isChainShow = !isChainShow;
     Navigator.pop(context);
   }
 

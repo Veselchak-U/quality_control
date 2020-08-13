@@ -148,7 +148,12 @@ class HistoryScreenItem extends StatelessWidget {
       if (event.comment != null && event.comment.isNotEmpty) {
         comment = ', комментарии: ${event.comment}';
       }
-      var action = event.rootId == null ? 'установил' : 'внёс изменения:';
+      String action;
+      if (bloc.isChainShow) {
+        action = event.rootId == null ? 'установил' : 'внёс изменения:';
+      } else {
+        action = 'установил';
+      }
       result = '$action статус "$statusName"$userDate$comment';
     } else if (eventType == EventType.SET_RATING) {
       //
@@ -179,8 +184,12 @@ class HistoryScreenItem extends StatelessWidget {
           unionComment = ', комментарии: $comment';
         }
       }
-      var action =
-          event.rootId == null ? 'выставил оценку' : 'внёс изменения: оценка';
+      String action;
+      if (bloc.isChainShow) {
+        action = event.rootId == null ? 'выставил оценку' : 'внёс изменения: оценка';
+      } else {
+        action = 'выставил оценку';
+      }
       result = '$action "$ratingName"$unionComment';
     }
     return result;

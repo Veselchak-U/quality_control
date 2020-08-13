@@ -102,8 +102,13 @@ class QualityBloc extends IBloc {
 
   void updateIntervalList({DateTime date}) {
     selectedDate = date;
-    intervalsByDate = request.getIntervalsByDate(date: selectedDate);
-    selectedInterval = intervalsByDate[0];
+    if (date == null) {
+      intervalsByDate = [];
+      selectedInterval = null;
+    } else {
+      intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+      selectedInterval = intervalsByDate[0];
+    }
     _log.i('updateIntervalList currentDate = $selectedDate');
   }
 

@@ -118,7 +118,7 @@ class _StatusScreenState extends State<StatusScreen> {
       ),
       body: Form(
         key: _formKey,
-        autovalidate: true,
+//        autovalidate: true,
         child: Container(
             color: Colors.white30,
             child: SingleChildScrollView(
@@ -140,36 +140,18 @@ class _StatusScreenState extends State<StatusScreen> {
                           /*FractionallySizedBox(
                           widthFactor: 0.5,*/
                           child: DropdownButtonFormField<DateTime>(
-                            hint: isUpdateMode
-                                ? Align(
-                                    alignment: Alignment.center,
-                                    child:
-                                        Text(_bloc.selectedDate.dateForHuman()))
-                                : Align(
-                                    alignment: Alignment.center,
-                                    child: Text('Дата работы')),
+                            hint: _getDateHint(),
                             value: _bloc.selectedDate,
                             elevation: 4,
                             isExpanded: true,
                             decoration: InputDecoration(
                                 contentPadding: EdgeInsets.all(0),
-                                filled: _bloc.selectedDate == null,
+                                filled: isUpdateMode,
                                 fillColor: _fillColor,
                                 border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(8)))),
-                            items: isUpdateMode
-                                ? null
-                                : _bloc.intervalDates
-                                    .map((DateTime e) =>
-                                        DropdownMenuItem<DateTime>(
-                                            child: Align(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  e.dateForHuman(),
-                                                )),
-                                            value: e))
-                                    .toList(),
+                            items: _getDateItems(),
                             onChanged: (DateTime value) {
                               if (!isUpdateMode) {
                                 setState(() {
@@ -197,34 +179,18 @@ class _StatusScreenState extends State<StatusScreen> {
                             /*FractionallySizedBox(
                             widthFactor: 0.5,*/
                             child: DropdownButtonFormField<WorkInterval>(
-                              hint: isUpdateMode
-                                  ? Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                          _bloc.selectedInterval.toString()))
-                                  : Align(
-                                      alignment: Alignment.center,
-                                      child: Text('Интервал работы')),
+                              hint: _getIntervalHint(),
                               value: _bloc.selectedInterval,
                               elevation: 4,
                               isExpanded: true,
                               decoration: InputDecoration(
                                   contentPadding: EdgeInsets.all(0),
-                                  filled: _bloc.selectedInterval == null,
+                                  filled: isUpdateMode,
                                   fillColor: _fillColor,
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(8)))),
-                              items: isUpdateMode
-                                  ? null
-                                  : _bloc.intervalsByDate
-                                      .map((WorkInterval e) =>
-                                          DropdownMenuItem<WorkInterval>(
-                                              child: Align(
-                                                  alignment: Alignment.center,
-                                                  child: Text(e.toString())),
-                                              value: e))
-                                      .toList(),
+                              items: _getIntervalItems(),
                               onChanged: (WorkInterval value) {
                                 if (!isUpdateMode) {
                                   setState(() {
@@ -255,9 +221,12 @@ class _StatusScreenState extends State<StatusScreen> {
                               elevation: 4,
                               isExpanded: true,
                               decoration: InputDecoration(
+                                  helperText: _bloc.selectedStatus == null
+                                      ? 'Обязательное поле'
+                                      : '',
                                   contentPadding: EdgeInsets.only(left: 8),
-                                  filled: _bloc.selectedStatus == null,
-                                  fillColor: _fillColor,
+//                                  filled: _bloc.selectedStatus == null,
+//                                  fillColor: _fillColor,
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(8)))),
@@ -302,8 +271,8 @@ class _StatusScreenState extends State<StatusScreen> {
                                 decoration: InputDecoration(
                                     labelText: 'Дата',
                                     contentPadding: EdgeInsets.only(left: 8),
-                                    filled: _bloc.selectedFactDate == null,
-                                    fillColor: _fillColor,
+//                                    filled: _bloc.selectedFactDate == null,
+//                                    fillColor: _fillColor,
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(8)))),
@@ -345,8 +314,8 @@ class _StatusScreenState extends State<StatusScreen> {
                                 decoration: InputDecoration(
                                     labelText: 'Время',
                                     contentPadding: EdgeInsets.only(left: 8),
-                                    filled: _bloc.selectedFactTime == null,
-                                    fillColor: _fillColor,
+//                                    filled: _bloc.selectedFactTime == null,
+//                                    fillColor: _fillColor,
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(8)))),
@@ -386,8 +355,8 @@ class _StatusScreenState extends State<StatusScreen> {
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(8),
-                            filled: _bloc.inputtedComments.isEmpty,
-                            fillColor: _fillColor,
+//                            filled: _bloc.inputtedComments.isEmpty,
+//                            fillColor: _fillColor,
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(8)))),
@@ -440,5 +409,78 @@ class _StatusScreenState extends State<StatusScreen> {
       ),
       bottomNavigationBar: bottomNavigationBar,
     );
+  }
+
+  Widget _getDateHint() {
+    Widget result;
+//    if (isUpdateMode) {
+      var isNullDate = _bloc.selectedDate == null;
+      result = Align(
+          alignment: Alignment.center,
+          child: Text(
+              isNullDate ? 'Не задано' : _bloc.selectedDate.dateForHuman()));
+//    }
+    return result;
+  }
+
+  Widget _getIntervalHint() {
+    Widget result;
+//    if (isUpdateMode) {
+      var isNullInterval = _bloc.selectedInterval == null;
+      result = Align(
+          alignment: Alignment.center,
+          child: Text(isNullInterval
+              ? 'Не задано'
+              : _bloc.selectedInterval.toString()));
+//    }
+    return result;
+  }
+
+  List<DropdownMenuItem<DateTime>> _getDateItems() {
+    if (_bloc.intervalDates == null || _bloc.intervalDates.isEmpty) {
+      return null;
+    }
+
+    var result = <DropdownMenuItem<DateTime>>[];
+
+    var firstItem = DropdownMenuItem<DateTime>(
+        child: Align(alignment: Alignment.center, child: Text('Не задано')),
+        value: null);
+    result.add(firstItem);
+
+    if (!isUpdateMode) {
+      var anotherItems = _bloc.intervalDates
+          .map((DateTime e) => DropdownMenuItem<DateTime>(
+              child: Align(
+                  alignment: Alignment.center, child: Text(e.dateForHuman())),
+              value: e))
+          .toList();
+      result.addAll(anotherItems);
+    }
+    return result;
+  }
+
+  List<DropdownMenuItem<WorkInterval>> _getIntervalItems() {
+    if (_bloc.intervalsByDate == null || _bloc.intervalsByDate.isEmpty) {
+      return null;
+    }
+
+    var result = <DropdownMenuItem<WorkInterval>>[];
+
+    var firstItem = DropdownMenuItem<WorkInterval>(
+        child: Align(alignment: Alignment.center, child: Text('Не задано')),
+        value: null);
+    result.add(firstItem);
+
+    if (!isUpdateMode) {
+      var anotherItems = _bloc.intervalsByDate
+          .map((WorkInterval e) => DropdownMenuItem<WorkInterval>(
+              child:
+                  Align(alignment: Alignment.center, child: Text(e.toString())),
+              value: e))
+          .toList();
+      result.addAll(anotherItems);
+    }
+    return result;
   }
 }
