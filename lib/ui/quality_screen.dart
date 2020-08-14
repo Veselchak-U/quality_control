@@ -267,8 +267,9 @@ class _QualityScreenState extends State<QualityScreen> {
                                       ? 'Обязательное поле'
                                       : '',
                                   contentPadding: EdgeInsets.only(left: 8),
-//                                  filled: _bloc.selectedPresetComment == null,
-//                                  fillColor: _fillColor,
+                                  filled: _bloc.presetComments == null ||
+                                      _bloc.presetComments.isEmpty,
+                                  fillColor: _fillColor,
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(8)))),

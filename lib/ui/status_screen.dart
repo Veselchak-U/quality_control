@@ -266,10 +266,20 @@ class _StatusScreenState extends State<StatusScreen> {
 //                            Text('дата'),
 //                            SizedBox(width: 8),
                             Container(
-                              width: 100,
+                              width: 140,
                               child: TextFormField(
+                                autovalidate: true,
                                 decoration: InputDecoration(
-                                    labelText: 'Дата',
+                                    labelText: _bloc.selectedFactDate == null
+                                        ? 'Дата'
+                                        : null,
+                                    helperText: '',
+                                    suffixIcon: _bloc.selectedFactDate != null
+                                        ? IconButton(
+                                            icon: Icon(Icons.clear),
+                                            onPressed: _onClearFactDate,
+                                          )
+                                        : null,
                                     contentPadding: EdgeInsets.only(left: 8),
 //                                    filled: _bloc.selectedFactDate == null,
 //                                    fillColor: _fillColor,
@@ -297,6 +307,10 @@ class _StatusScreenState extends State<StatusScreen> {
                                   });
                                 },
                                 validator: (String value) {
+                                  if (_bloc.selectedFactDate == null &&
+                                      _bloc.selectedFactTime != null) {
+                                    return 'Выберите';
+                                  }
                                   return null;
                                 },
                               ),
@@ -309,10 +323,20 @@ class _StatusScreenState extends State<StatusScreen> {
 //                              width: 8,
 //                            ),
                             Container(
-                              width: 70,
+                              width: 100,
                               child: TextFormField(
+                                autovalidate: true,
                                 decoration: InputDecoration(
-                                    labelText: 'Время',
+                                    labelText: _bloc.selectedFactTime == null
+                                        ? 'Время'
+                                        : null,
+                                    helperText: '',
+                                    suffixIcon: _bloc.selectedFactTime != null
+                                        ? IconButton(
+                                            icon: Icon(Icons.clear),
+                                            onPressed: _onClearFactTime,
+                                          )
+                                        : null,
                                     contentPadding: EdgeInsets.only(left: 8),
 //                                    filled: _bloc.selectedFactTime == null,
 //                                    fillColor: _fillColor,
@@ -336,6 +360,10 @@ class _StatusScreenState extends State<StatusScreen> {
                                   });
                                 },
                                 validator: (String value) {
+                                  if (_bloc.selectedFactTime == null &&
+                                      _bloc.selectedFactDate != null) {
+                                    return 'Выберите';
+                                  }
                                   return null;
                                 },
                               ),
@@ -414,11 +442,11 @@ class _StatusScreenState extends State<StatusScreen> {
   Widget _getDateHint() {
     Widget result;
 //    if (isUpdateMode) {
-      var isNullDate = _bloc.selectedDate == null;
-      result = Align(
-          alignment: Alignment.center,
-          child: Text(
-              isNullDate ? 'Не задано' : _bloc.selectedDate.dateForHuman()));
+    var isNullDate = _bloc.selectedDate == null;
+    result = Align(
+        alignment: Alignment.center,
+        child:
+            Text(isNullDate ? 'Не задано' : _bloc.selectedDate.dateForHuman()));
 //    }
     return result;
   }
@@ -426,12 +454,11 @@ class _StatusScreenState extends State<StatusScreen> {
   Widget _getIntervalHint() {
     Widget result;
 //    if (isUpdateMode) {
-      var isNullInterval = _bloc.selectedInterval == null;
-      result = Align(
-          alignment: Alignment.center,
-          child: Text(isNullInterval
-              ? 'Не задано'
-              : _bloc.selectedInterval.toString()));
+    var isNullInterval = _bloc.selectedInterval == null;
+    result = Align(
+        alignment: Alignment.center,
+        child: Text(
+            isNullInterval ? 'Не задано' : _bloc.selectedInterval.toString()));
 //    }
     return result;
   }
@@ -482,5 +509,22 @@ class _StatusScreenState extends State<StatusScreen> {
       result.addAll(anotherItems);
     }
     return result;
+  }
+
+  void _onClearFactTime() {
+    setState(() {
+      _bloc.selectedFactTime = null;
+      timeFieldController.clear();
+      FocusScope.of(context).unfocus();
+    });
+  }
+
+  void _onClearFactDate() {
+    setState(() {
+      _bloc.selectedFactDate = null;
+      dateFieldController.clear();
+      FocusScope.of(context).unfocus();
+    });
+
   }
 }

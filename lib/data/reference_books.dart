@@ -36,7 +36,7 @@ class ReferenceBooks {
           'Не заказан пропуск на объект',
           'Опоздание заказчика более часа'
         ],
-        isCommentRequired: true,
+        isCommentRequired: false,
         isCanUpdate: true),
     Rating(
         label: '3',
@@ -50,9 +50,9 @@ class ReferenceBooks {
     Rating(
         label: '4',
         name: 'Хорошо',
-        presetComments: ['Всё штатно', 'Предложение по улучшению'],
+//        presetComments: ['Всё штатно', 'Предложение по улучшению'],
         isCommentRequired: false,
-        isCanUpdate: false),
+        isCanUpdate: true),
     Rating(
         label: '5',
         name: 'Очень хорошо',
@@ -63,7 +63,7 @@ class ReferenceBooks {
           'Всё вышеперечисленное'
         ],
         isCommentRequired: true,
-        isCanUpdate: false)
+        isCanUpdate: true)
   ];
 
   static List<Request> getRequests() {
