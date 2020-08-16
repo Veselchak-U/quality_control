@@ -6,9 +6,11 @@ import 'package:quality_control/di/screen_builder.dart';
 import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/rating.dart';
-import 'package:quality_control/entity/request.dart';
+import 'package:quality_control/entity/request_interval_item.dart';
+import 'package:quality_control/entity/request_item.dart';
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
+import 'package:quality_control/util/utils.dart';
 
 class QualityBloc extends IBloc {
   QualityBloc(
@@ -21,7 +23,8 @@ class QualityBloc extends IBloc {
 
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
-  Request request; // заявка
+  RequestItem requestItem; // заявка, выбранный элемент списка
+  RequestIntervalItem requestIntervalItem; // интервал, выбранный элемент списка
   List<DateTime> intervalDates; // даты из интервалов по заявке
   List<WorkInterval> intervalsByDate; // интервалы по текущей дате
   DateTime selectedDate;
@@ -43,16 +46,15 @@ class QualityBloc extends IBloc {
 
   bool initialize() {
     _appState = _repository.appState;
-    request = _repository.getRequestById(requestId: _appState.requestId);
+    requestItem = _appState.requestItem;
+    requestIntervalItem = _appState.requestIntervalItem;
     ratingReferences = _repository.ratingReferences;
 
     if (_appState.event != null) {
       // режим корректировки
       isUpdateMode = true;
       parentEvent = _appState.event;
-//      intervalDates = <DateTime>[event.dateRequest];
       selectedDate = parentEvent.dateRequest;
-//      intervalsByDate = <WorkInterval>[event.workInterval];
       selectedInterval = parentEvent.workInterval;
       selectedRating = ratingReferences
           .firstWhere((e) => e.label == parentEvent.ratingLabel);
@@ -63,11 +65,25 @@ class QualityBloc extends IBloc {
       inputtedComments = parentEvent.comment ?? '';
     } else {
       // режим добавления
-      intervalDates = request.getDatesFromIntervals(limitToday: true);
-      selectedDate = DateTime.now().trunc(); // TODO(dyv): брать ближайшую дату
-      intervalsByDate = request.getIntervalsByDate(date: selectedDate);
-      selectedInterval =
-          intervalsByDate[0]; // TODO(dyv): брать ближайший интервал
+      intervalDates = requestItem.getDatesFromIntervals(withoutFuture: true);
+      if (requestIntervalItem != null) {
+        // если перешли со списка интервалов
+        var now = DateTime.now();
+        selectedDate = requestIntervalItem.interval.dateBegin.trunc();
+        if (selectedDate.isAfter(now)) {
+          selectedDate = intervalDates.last; // ближайшая дата снизу
+        }
+        intervalsByDate = requestItem.getIntervalsByDate(date: selectedDate);
+        selectedInterval = requestIntervalItem.interval;
+        if (selectedInterval.dateBegin.isAfter(now)) {
+          selectedInterval =
+              Utils.getNearestInterval(intervals: intervalsByDate);
+        }
+      } else {
+        selectedDate = intervalDates.last; // ближайшая дата снизу
+        intervalsByDate = requestItem.getIntervalsByDate(date: selectedDate);
+        selectedInterval = Utils.getNearestInterval(intervals: intervalsByDate);
+      }
       presetComments = [];
       isPresetCommentRequired = false;
       selectedPresetComment = null;
@@ -106,7 +122,7 @@ class QualityBloc extends IBloc {
       intervalsByDate = [];
       selectedInterval = null;
     } else {
-      intervalsByDate = request.getIntervalsByDate(date: selectedDate);
+      intervalsByDate = requestItem.getIntervalsByDate(date: selectedDate);
       selectedInterval = intervalsByDate[0];
     }
     _log.i('updateIntervalList currentDate = $selectedDate');
@@ -139,7 +155,7 @@ class QualityBloc extends IBloc {
         comment: inputtedComments);
 
     _repository.addEvent(
-        requestId: request.id,
+        requestId: requestItem.id,
         newEvent: newEvent,
         parentEvent: isUpdateMode ? parentEvent : null);
 

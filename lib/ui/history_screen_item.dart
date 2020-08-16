@@ -132,10 +132,10 @@ class HistoryScreenItem extends StatelessWidget {
       // УСТАНОВКА СТАТУСА
       //
       String statusName;
-      if (bloc.statuses == null || bloc.statuses.isEmpty) {
+      if (bloc.statusReferences == null || bloc.statusReferences.isEmpty) {
         statusName = event.statusLabel;
       } else {
-        statusName = bloc.statuses
+        statusName = bloc.statusReferences
             .firstWhere((Status e) => e.label == event.statusLabel)
             .name;
       }
@@ -160,10 +160,10 @@ class HistoryScreenItem extends StatelessWidget {
       // ВЫСТАВЛЕНИЕ ОЦЕНКИ
       //
       String ratingName;
-      if (bloc.ratings == null || bloc.ratings.isEmpty) {
+      if (bloc.ratingReferences == null || bloc.ratingReferences.isEmpty) {
         ratingName = event.ratingLabel;
       } else {
-        ratingName = bloc.ratings
+        ratingName = bloc.ratingReferences
             .firstWhere((Rating e) => e.label == event.ratingLabel)
             .name;
       }

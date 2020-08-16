@@ -88,7 +88,7 @@ class _StatusScreenState extends State<StatusScreen> {
       return Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            title: Text('Заявка № ${_bloc.request.number}'),
+            title: Text('Заявка № ${_bloc.requestItem.number}'),
           ),
           body: Container(
               color: Colors.white,
@@ -112,7 +112,7 @@ class _StatusScreenState extends State<StatusScreen> {
         title: Text(
           isUpdateMode
               ? 'Корректировка события'
-              : 'Заявка № ${_bloc.request.number}',
+              : 'Заявка № ${_bloc.requestItem.number}',
           textAlign: TextAlign.center,
         ),
       ),

@@ -18,8 +18,6 @@ class Repository {
       : _dataSource = dataSource,
         _streamService = streamService,
         _appState = appState {
-    // входящие события о небходимости обновить данные
-    streamService.refreshDataEventsStream.listen(_onRefreshDataEvent);
     _log.i('create');
   }
 
@@ -35,6 +33,9 @@ class Repository {
   Future<bool> initialize({@required User user}) async {
     _log.d('initialize() start');
     _currentUser = user;
+
+    // обработчик входящих событий о небходимости обновить данные
+    _streamService.refreshDataEventsStream.listen(_onRefreshDataEvent);
 
     // Зачитываем данные из БД
     await _dataSource.initialize();
@@ -82,11 +83,11 @@ class Repository {
     if (newAppState.user != null) {
       _appState.user = newAppState.user;
     }
-    if (newAppState.requestId != null) {
-      _appState.requestId = newAppState.requestId;
+    if (newAppState.requestItem != null) {
+      _appState.requestItem = newAppState.requestItem;
     }
-    if (newAppState.intervalId != null) {
-      _appState.intervalId = newAppState.intervalId;
+    if (newAppState.requestIntervalItem != null) {
+      _appState.requestIntervalItem = newAppState.requestIntervalItem;
     }
     _appState.event = newAppState.event;
     if (newAppState.listPresentation != null) {

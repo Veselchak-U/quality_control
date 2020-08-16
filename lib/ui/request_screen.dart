@@ -3,6 +3,7 @@ import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/request_bloc.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/request_interval_item.dart';
+import 'package:quality_control/entity/request_item.dart';
 import 'package:quality_control/ui/request_screen_interval_item.dart';
 import 'package:quality_control/ui/request_screen_item.dart';
 
@@ -127,7 +128,7 @@ class _RequestScreenState extends State<RequestScreen>
 
     var requestList = StreamBuilder(
       stream: _bloc.outRequestsItems,
-      builder: (BuildContext context, AsyncSnapshot<List<Request>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<RequestItem>> snapshot) {
         if (snapshot.data == null || snapshot.data.isEmpty) {
           return Center(
               child: Text(

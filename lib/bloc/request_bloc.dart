@@ -5,8 +5,8 @@ import 'package:quality_control/bloc/common/i_bloc.dart';
 import 'package:quality_control/data/repository.dart';
 import 'package:quality_control/di/screen_builder.dart';
 import 'package:quality_control/entity/app_state.dart';
-import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/request_interval_item.dart';
+import 'package:quality_control/entity/request_item.dart';
 import 'package:quality_control/service/stream_service.dart';
 
 class RequestBloc extends IBloc {
@@ -32,7 +32,7 @@ class RequestBloc extends IBloc {
   final StreamService _streamService;
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
-  Stream<List<Request>> outRequestsItems;
+  Stream<List<RequestItem>> outRequestsItems;
   Stream<List<RequestIntervalItem>> outRequestIntervalItems;
 
   ListPresentation currentListPresentation;
@@ -50,7 +50,6 @@ class RequestBloc extends IBloc {
 //  void _debugListenRequestsItems(List<Request> inRequests) {
 //    print('ku');
 //  }
-
 
   void changeListPresentation() {
     if (currentListPresentation == ListPresentation.INTERVAL) {
@@ -89,11 +88,18 @@ class RequestBloc extends IBloc {
     _log.d('onChangeSearchString text = $text');
   }
 
-  void onTapListItem({String requestId, String intervalId}) {
-    _log.d('onTapListItem requestId = $requestId, intervalId = $intervalId');
+  void onTapListItem(
+      {RequestItem requestItem, RequestIntervalItem intervalItem}) {
+    if (requestItem == null && intervalItem != null) {
+      requestItem = _repository
+          .getRequestById(requestId: intervalItem.requestId)
+          .toRequestItem();
+    }
     _repository.setAppState(
-        newAppState: AppState(requestId: requestId, intervalId: intervalId));
-    _streamService.refreshDataEventsStream.add(RefreshDataEvent.REFRESH_REQUESTS);
+        newAppState:
+            AppState(requestItem: requestItem, requestIntervalItem: intervalItem));
+    _streamService.refreshDataEventsStream
+        .add(RefreshDataEvent.REFRESH_REQUESTS);
 
     var index = _appState.bottomNavigationBarIndex;
     Widget Function() nextScreen;
@@ -116,5 +122,4 @@ class RequestBloc extends IBloc {
   void dispose() {
     _log.i('dispose');
   }
-
 }

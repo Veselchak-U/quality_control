@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/info_bloc.dart';
-import 'package:quality_control/entity/request.dart';
+import 'package:quality_control/entity/request_item.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
 
 class InfoScreen extends StatefulWidget {
@@ -11,14 +11,14 @@ class InfoScreen extends StatefulWidget {
 
 class _InfoScreenState extends State<InfoScreen> {
   InfoBloc _bloc;
-  Request _request;
+  RequestItem _requestItem;
 
   @override
   void initState() {
     super.initState();
     _bloc = BlocProvider.of(context);
     _bloc.context = context;
-    _request = _bloc.request;
+    _requestItem = _bloc.requestItem;
   }
 
   @override
@@ -54,7 +54,7 @@ class _InfoScreenState extends State<InfoScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Заявка № ${_request.number}'),
+        title: Text('Заявка № ${_requestItem.number}'),
       ),
       body: Container(
         color: Colors.white30,
@@ -67,14 +67,14 @@ class _InfoScreenState extends State<InfoScreen> {
               _textBlock(
                   header: 'Даты:',
                   body:
-                      '${_request.dateFrom.dateForHuman()} - ${_request.dateTo.dateForHuman()}'),
+                      '${_requestItem.dateFrom.dateForHuman()} - ${_requestItem.dateTo.dateForHuman()}'),
               _textBlock(
                   header: 'Интервалы работы:',
-                  body: _request.allIntervalsToString()),
-              _textBlock(header: 'Откуда:', body: _request.routeFrom),
-              _textBlock(header: 'Куда:', body: _request.routeTo),
-              _textBlock(header: 'Описание:', body: _request.routeDescription),
-              _textBlock(header: 'Подразделение:', body: _request.customer),
+                  body: _requestItem.allIntervalsToString()),
+              _textBlock(header: 'Откуда:', body: _requestItem.routeFrom),
+              _textBlock(header: 'Куда:', body: _requestItem.routeTo),
+              _textBlock(header: 'Описание:', body: _requestItem.routeDescription),
+              _textBlock(header: 'Подразделение:', body: _requestItem.customer),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -86,11 +86,11 @@ class _InfoScreenState extends State<InfoScreen> {
                             style: TextStyle(fontWeight: FontWeight.bold)),
                         Padding(
                             padding: EdgeInsets.only(left: 16),
-                            child: Text(_request.customerDelegat.toFullFIO()))
+                            child: Text(_requestItem.customerDelegat.toFullFIO()))
                       ],
                     ),
                   ),
-                  if (_request.customerDelegat.phone.isEmpty)
+                  if (_requestItem.customerDelegat.phone.isEmpty)
                     SizedBox.shrink()
                   else
                     Container(
@@ -108,8 +108,8 @@ class _InfoScreenState extends State<InfoScreen> {
               SizedBox(
                 height: 8,
               ),
-              _textBlock(header: 'Комментарий:', body: _request.comment),
-              _textBlock(header: 'Примечание:', body: _request.note)
+              _textBlock(header: 'Комментарий:', body: _requestItem.comment),
+              _textBlock(header: 'Примечание:', body: _requestItem.note)
             ],
           ),
         )),

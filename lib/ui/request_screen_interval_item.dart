@@ -4,17 +4,16 @@ import 'package:quality_control/entity/request_interval_item.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
 
 class RequestScreenIntervalItem extends StatelessWidget {
-  RequestScreenIntervalItem(this.item, this.bloc);
+  RequestScreenIntervalItem(this.intervalItem, this.bloc);
 
-  final RequestIntervalItem item;
+  final RequestIntervalItem intervalItem;
   final RequestBloc bloc;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        bloc.onTapListItem(
-            requestId: item.requestId, intervalId: item.interval.id);
+        bloc.onTapListItem(intervalItem: intervalItem);
       },
       splashColor: Theme.of(context).accentColor,
       child: Padding(
@@ -34,7 +33,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
                       ),
                       padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
                       child: Text(
-                        'Заявка: ${item.number}',
+                        'Заявка: ${intervalItem.number}',
                         style: TextStyle(color: Colors.white),
                       )),
                   SizedBox(width: 8),
@@ -44,8 +43,8 @@ class RequestScreenIntervalItem extends StatelessWidget {
                       spacing: 8,
                       alignment: WrapAlignment.end,
                       children: [
-                        Text(item.interval.dateBegin.formatDate('dd.MM.yy')),
-                        Text(item.intervalTimes(),
+                        Text(intervalItem.interval.dateBegin.formatDate('dd.MM.yy')),
+                        Text(intervalItem.intervalTimes(),
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
@@ -65,7 +64,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Flexible(child: Text('${item.routeFrom} - ${item.routeTo}')),
+                  Flexible(child: Text('${intervalItem.routeFrom} - ${intervalItem.routeTo}')),
                 ],
               ),
               SizedBox(
@@ -83,7 +82,7 @@ class RequestScreenIntervalItem extends StatelessWidget {
                   ),
                   Flexible(
                       child: Text(
-                          '${item.customer} - ${item.customerDelegat.toFullFIO()}')),
+                          '${intervalItem.customer} - ${intervalItem.customerDelegat.toFullFIO()}')),
                 ],
               ),
               SizedBox(

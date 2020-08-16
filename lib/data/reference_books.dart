@@ -265,6 +265,34 @@ class ReferenceBooks {
       ],
     );
 
-    return [request1, request2];
+    var request3 = Request(
+      id: '92089',
+      number: 9000,
+      dateFrom: today,
+      dateTo: today,
+      intervals: [
+        WorkInterval(
+            id: '${idCounter++}',
+            dateBegin: DateTime(today.year, today.month, today.day, 10, 00),
+            dateEnd: DateTime(today.year, today.month, today.day, 11, 00))
+      ],
+      routeFrom: 'Фабрика',
+      routeTo: 'Отвал',
+      routeDescription: 'По 325 отчету',
+      customer: 'МГОК Пищеблок',
+      customerDelegat: User(
+          id: '13',
+          userRole: UserRole.DELEGAT,
+          lastName: 'Васильев',
+          firstName: 'Василий',
+          middleName: 'Васильевич',
+          phone: '+799911110003'),
+      comment: 'Две ездки',
+      note:
+          'Доставка кормов',
+      events: [],
+    );
+
+    return [request1, request2, request3];
   }
 }

@@ -7,7 +7,8 @@ import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/event_item.dart';
 import 'package:quality_control/entity/rating.dart';
-import 'package:quality_control/entity/request.dart';
+import 'package:quality_control/entity/request_interval_item.dart';
+import 'package:quality_control/entity/request_item.dart';
 import 'package:quality_control/entity/status.dart';
 import 'package:quality_control/service/stream_service.dart';
 
@@ -18,9 +19,7 @@ class HistoryBloc extends IBloc {
       @required StreamService streamService})
       : _repository = repository,
         _screenBuilder = screenBuilder,
-        outEventItems = streamService.eventItemsStream.stream,
-        statuses = repository.statusReferences,
-        ratings = repository.ratingReferences {
+        outEventItems = streamService.eventItemsStream.stream {
     initialize();
     _log.i('create');
   }
@@ -28,9 +27,10 @@ class HistoryBloc extends IBloc {
   final Repository _repository;
   final ScreenBuilder _screenBuilder;
   final Stream<List<EventItem>> outEventItems;
-  final List<Status> statuses;
-  final List<Rating> ratings;
-  Request currentRequest;
+  List<Status> statusReferences;
+  List<Rating> ratingReferences;
+  RequestItem requestItem; // заявка, выбранный элемент списка
+  RequestIntervalItem requestIntervalItem; // интервал, выбранный элемент списка
   AppState _appState;
   bool isChainShow;
 
@@ -41,9 +41,12 @@ class HistoryBloc extends IBloc {
 
   void initialize() {
     _appState = _repository.appState;
+    requestItem = _appState.requestItem;
+    requestIntervalItem = _appState.requestIntervalItem;
+    statusReferences = _repository.statusReferences;
+    ratingReferences = _repository.ratingReferences;
     var rootId = _appState.eventFilterByChain;
     isChainShow = rootId != null && rootId.isNotEmpty;
-    currentRequest = _repository.getRequestById(requestId: _appState.requestId);
   }
 
   void onTapEditBottomMenu({Event event}) {

@@ -1,6 +1,8 @@
 import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/rating.dart';
 import 'package:quality_control/entity/request.dart';
+import 'package:quality_control/entity/request_interval_item.dart';
+import 'package:quality_control/entity/request_item.dart';
 import 'package:quality_control/entity/status.dart';
 import 'package:quality_control/entity/user.dart';
 
@@ -10,8 +12,8 @@ class AppState {
       this.requestFilterByText,
       this.eventFilterByChain,
       this.user,
-      this.requestId,
-      this.intervalId,
+      this.requestItem,
+      this.requestIntervalItem,
       this.event,
       this.listPresentation,
       this.bottomNavigationBarIndex,
@@ -23,8 +25,8 @@ class AppState {
   String requestFilterByText; // фильтр заявок по тексту
   String eventFilterByChain; // фильтр событий по цепочке
   User user; // текущий пользователь
-  String requestId; // текущая заявка
-  String intervalId; // текущий интервал
+  RequestItem requestItem; // выбранная заявка
+  RequestIntervalItem requestIntervalItem; // выбранный интервал
   Event event; // корректируемое событие из заявки
   ListPresentation listPresentation; // текущий режим показа списка
   int bottomNavigationBarIndex; // текущая вкладка внизу

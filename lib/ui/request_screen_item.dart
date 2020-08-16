@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:quality_control/bloc/request_bloc.dart';
-import 'package:quality_control/entity/request.dart';
+import 'package:quality_control/entity/request_item.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
 
 class RequestScreenItem extends StatelessWidget {
-  RequestScreenItem(this.request, this.bloc);
+  RequestScreenItem(this.requestItem, this.bloc);
 
-  final Request request;
+  final RequestItem requestItem;
   final RequestBloc bloc;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        bloc.onTapListItem(requestId: request.id);
+        bloc.onTapListItem(requestItem: requestItem);
       },
       splashColor: Theme.of(context).accentColor,
       child: Padding(
@@ -33,7 +33,7 @@ class RequestScreenItem extends StatelessWidget {
                       ),
                       padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
                       child: Text(
-                        'Заявка: ${request.number}',
+                        'Заявка: ${requestItem.number}',
                         style: TextStyle(color: Colors.white),
                       )),
                   SizedBox(width: 8),
@@ -44,7 +44,7 @@ class RequestScreenItem extends StatelessWidget {
                     alignment: WrapAlignment.end,
                     children: [
                       Text(
-                        request.dateFrom.formatDate('dd.MM.yy'),
+                        requestItem.dateFrom.formatDate('dd.MM.yy'),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
 //                      Text(
@@ -52,7 +52,7 @@ class RequestScreenItem extends StatelessWidget {
 //                        style: TextStyle(fontWeight: FontWeight.bold),
 //                      ),
                       Text(
-                        ' - ${request.dateTo.formatDate('dd.MM.yy')}',
+                        ' - ${requestItem.dateTo.formatDate('dd.MM.yy')}',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -72,7 +72,7 @@ class RequestScreenItem extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Flexible(child: Text(request.allIntervalsToString())),
+                  Flexible(child: Text(requestItem.allIntervalsToString())),
                 ],
               ),
               SizedBox(
@@ -89,7 +89,7 @@ class RequestScreenItem extends StatelessWidget {
                     ),
                   ),
                   Flexible(
-                      child: Text('${request.routeFrom} - ${request.routeTo}')),
+                      child: Text('${requestItem.routeFrom} - ${requestItem.routeTo}')),
                 ],
               ),
               SizedBox(
@@ -107,7 +107,7 @@ class RequestScreenItem extends StatelessWidget {
                   ),
                   Flexible(
                       child: Text(
-                          '${request.customer} - ${request.customerDelegat.toFullFIO()}')),
+                          '${requestItem.customer} - ${requestItem.customerDelegat.toFullFIO()}')),
                 ],
               ),
               SizedBox(

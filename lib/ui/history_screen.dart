@@ -55,7 +55,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Заявка № ${_bloc.currentRequest.number}'),
+        title: Text('Заявка № ${_bloc.requestItem.number}'),
       ),
       body: StreamBuilder(
         stream: _bloc.outEventItems,

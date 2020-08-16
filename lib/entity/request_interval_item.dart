@@ -1,6 +1,7 @@
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/user.dart';
 
+// Интервал заявки - элемент списка
 class RequestIntervalItem {
   RequestIntervalItem(
       {this.requestId,

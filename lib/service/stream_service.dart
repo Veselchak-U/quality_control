@@ -3,6 +3,7 @@ import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/entity/event_item.dart';
 import 'package:quality_control/entity/rating.dart';
+import 'package:quality_control/entity/request_item.dart';
 import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/entity/request.dart';
 import 'package:quality_control/entity/request_interval_item.dart';
@@ -23,8 +24,8 @@ class StreamService {
       BehaviorSubject<List<Request>>();
 
   // Элементы списка: заявки
-  final BehaviorSubject<List<Request>> requestItemsStream =
-      BehaviorSubject<List<Request>>();
+  final BehaviorSubject<List<RequestItem>> requestItemsStream =
+      BehaviorSubject<List<RequestItem>>();
 
   // Элементы списка: интервалы заявок
   final BehaviorSubject<List<RequestIntervalItem>> requestIntervalItemsStream =
@@ -68,10 +69,15 @@ class StreamService {
     _requestFilterByDate = FilterByDate.TODAY;
     _requestFilterByText = '';
 
-    requestsStream.map(_filterRequests).listen(requestItemsStream.add);
     requestsStream
-        .map(_convertRequestToRequestIntervalItem)
-        .map(_filterRequestsIntervalItem)
+        .map(_convertRequestsToRequestItems)
+        .map(_filterRequestItems)
+        .map(_sortRequestItems)
+        .listen(requestItemsStream.add);
+    requestsStream
+        .map(_convertRequestsToRequestIntervalItems)
+        .map(_filterRequestIntervalItems)
+        .map(_sortRequestIntervalItems)
         .listen(requestIntervalItemsStream.add);
     requestsStream.map(_filterCurrentEventItems).listen(eventItemsStream.add);
 
@@ -85,12 +91,12 @@ class StreamService {
 
   List<EventItem> _filterCurrentEventItems(List<Request> requests) {
     List<EventItem> result = [];
-    var currentRequestId = _appState.requestId;
+    var currentRequestId = _appState.requestItem.id;
     if (currentRequestId != null) {
       var index = requests.indexWhere((Request r) => r.id == currentRequestId);
       if (index != -1) {
         List<Event> events = requests[index].events;
-        if (events != null) {
+        if (events != null && events.isNotEmpty) {
           // filter by chain
           var filterEvents = <Event>[];
           var rootId = _appState.eventFilterByChain;
@@ -175,54 +181,54 @@ class StreamService {
         type: EventItemType.DATE_LABEL, labelText: date.dateForHuman());
   }
 
-  List<Request> _filterRequests(List<Request> inRequests) {
+  List<RequestItem> _filterRequestItems(List<RequestItem> inRequestItems) {
     // Сначала фильтруем заявки по дате
-    List<Request> filteredByDate = [];
+    List<RequestItem> filteredByDate = [];
     var today = DateTime.now().trunc();
 
     if (_requestFilterByDate == FilterByDate.TODAY) {
-      inRequests.forEach((Request request) {
-        var index = request.intervals
+      inRequestItems.forEach((item) {
+        var index = item.intervals
             .indexWhere((WorkInterval i) => i.dateBegin.trunc() == today);
         if (index != -1) {
-          filteredByDate.add(request);
+          filteredByDate.add(item);
         }
       });
     } else if (_requestFilterByDate == FilterByDate.BEFORE) {
-      inRequests.forEach((Request request) {
-        var index = request.intervals.indexWhere(
+      inRequestItems.forEach((item) {
+        var index = item.intervals.indexWhere(
             (WorkInterval i) => i.dateBegin.trunc().isBefore(today));
         if (index != -1) {
-          filteredByDate.add(request);
+          filteredByDate.add(item);
         }
       });
     } else if (_requestFilterByDate == FilterByDate.AFTER) {
-      inRequests.forEach((Request request) {
-        var index = request.intervals
+      inRequestItems.forEach((item) {
+        var index = item.intervals
             .indexWhere((WorkInterval i) => i.dateBegin.trunc().isAfter(today));
         if (index != -1) {
-          filteredByDate.add(request);
+          filteredByDate.add(item);
         }
       });
     }
 
     // Затем фильтруем заявки по тексту поиска
-    List<Request> filteredByText = [];
+    List<RequestItem> filteredByText = [];
 
     if (_requestFilterByText.isEmpty) {
       filteredByText = filteredByDate;
     } else {
       var searchString = _requestFilterByText.toLowerCase();
       var d = String.fromCharCode(0); // delimiter
-      filteredByDate.forEach((Request r) {
+      filteredByDate.forEach((RequestItem item) {
         var data1 =
-            '${r.number}$d${r.dateFrom.dateForHuman()}$d${r.dateTo.dateForHuman()}$d${r.allIntervalsToString()}$d';
-        var data2 = '${r.routeFrom}$d${r.routeTo}$d';
+            '${item.number}$d${item.dateFrom.dateForHuman()}$d${item.dateTo.dateForHuman()}$d${item.allIntervalsToString()}$d';
+        var data2 = '${item.routeFrom}$d${item.routeTo}$d';
         var data3 =
-            '${r.customer}$d${r.customerDelegat.lastName}$d${r.customerDelegat.firstName}$d${r.customerDelegat.middleName}$d';
+            '${item.customer}$d${item.customerDelegat.lastName}$d${item.customerDelegat.firstName}$d${item.customerDelegat.middleName}$d';
         var dataString = '$data1$data2$data3'.toLowerCase();
         if (dataString.contains(searchString)) {
-          filteredByText.add(r);
+          filteredByText.add(item);
         }
       });
     }
@@ -230,29 +236,53 @@ class StreamService {
     return filteredByText;
   }
 
-  List<RequestIntervalItem> _convertRequestToRequestIntervalItem(
+  List<RequestIntervalItem> _convertRequestsToRequestIntervalItems(
       List<Request> requests) {
     var result = <RequestIntervalItem>[];
     RequestIntervalItem item;
 
-    requests.forEach((Request request) {
-      request.intervals.forEach((WorkInterval interval) {
-        item = RequestIntervalItem(
-            requestId: request.id,
-            number: request.number,
-            interval: interval,
-            routeFrom: request.routeFrom,
-            routeTo: request.routeTo,
-            customer: request.customer,
-            customerDelegat: request.customerDelegat);
-        result.add(item);
+    if (requests != null && requests.isNotEmpty) {
+      requests.forEach((Request request) {
+        if (request.intervals != null && request.intervals.isNotEmpty) {
+          request.intervals.forEach((WorkInterval interval) {
+            item = RequestIntervalItem(
+                requestId: request.id,
+                number: request.number,
+                interval: interval,
+                routeFrom: request.routeFrom,
+                routeTo: request.routeTo,
+                customer: request.customer,
+                customerDelegat: request.customerDelegat);
+            result.add(item);
+          });
+        }
       });
-    });
-    _log.d('_convertRequestToRequestIntervalItem ${result.length} items');
+    }
+//    _log.d('_convertRequestToRequestIntervalItem ${result.length} items');
     return result;
   }
 
-  List<RequestIntervalItem> _filterRequestsIntervalItem(
+  List<RequestItem> _convertRequestsToRequestItems(List<Request> requests) {
+    var result = <RequestItem>[];
+    RequestItem item;
+
+    if (requests != null && requests.isNotEmpty) {
+      requests.forEach((Request request) {
+        item = request.toRequestItem();
+        result.add(item);
+      });
+    }
+    return result;
+  }
+
+  List<RequestItem> _sortRequestItems(List<RequestItem> items) {
+    if (items.isNotEmpty) {
+      items.sort((a, b) => a.number.compareTo(b.number));
+    }
+    return items;
+  }
+
+  List<RequestIntervalItem> _filterRequestIntervalItems(
       List<RequestIntervalItem> inItems) {
     // Сначала фильтруем интервалы по дате
     List<RequestIntervalItem> filteredByDate = [];
@@ -302,7 +332,17 @@ class StreamService {
     return filteredByText;
   }
 
+  List<RequestIntervalItem> _sortRequestIntervalItems(
+      List<RequestIntervalItem> items) {
+    if (items.isNotEmpty) {
+      items
+          .sort((a, b) => a.interval.dateBegin.compareTo(b.interval.dateBegin));
+    }
+    return items;
+  }
+
   void dispose() {
+    appStateStream.close();
     requestsStream.close();
     requestItemsStream.close();
     requestIntervalItemsStream.close();
