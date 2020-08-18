@@ -98,12 +98,8 @@ class _StatusScreenState extends State<StatusScreen> {
           bottomNavigationBar: bottomNavigationBar);
     }
 
-    var rowDivider = SizedBox(
-      height: 8,
-    );
-    var headerDivider = SizedBox(
-      height: 4,
-    );
+    var rowDivider = SizedBox(height: 8);
+    var headerDivider = SizedBox(height: 4);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -259,115 +255,131 @@ class _StatusScreenState extends State<StatusScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       headerDivider,
-                      Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      Center(
+                        child: Wrap(
+                          spacing: 30,
+                          runSpacing: 0,
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-//                            Text('дата'),
-//                            SizedBox(width: 8),
                             Container(
-                              width: 140,
-                              child: TextFormField(
-                                autovalidate: true,
-                                decoration: InputDecoration(
-                                    labelText: _bloc.selectedFactDate == null
-                                        ? 'Дата'
-                                        : null,
-                                    helperText: '',
-                                    suffixIcon: _bloc.selectedFactDate != null
-                                        ? IconButton(
-                                            icon: Icon(Icons.clear),
-                                            onPressed: _onClearFactDate,
-                                          )
-                                        : null,
-                                    contentPadding: EdgeInsets.only(left: 8),
+                                width: 130,
+                                child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      TextFormField(
+                                        autovalidate: true,
+                                        decoration: InputDecoration(
+                                            hintText: 'Дата',
+                                            helperText: '',
+                                            contentPadding:
+                                                EdgeInsets.only(left: 8),
 //                                    filled: _bloc.selectedFactDate == null,
 //                                    fillColor: _fillColor,
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8)))),
-                                readOnly: true,
-                                controller: dateFieldController,
-                                onTap: () {
-                                  showDatePicker(
-                                          context: context,
-                                          initialDate: _bloc.selectedFactDate ??
-                                              DateTime.now(),
-                                          firstDate: DateTime.now()
-                                              .subtract(Duration(days: 30)),
-                                          lastDate: DateTime.now())
-                                      .then((DateTime value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        _bloc.selectedFactDate = value;
-                                        dateFieldController.text =
-                                            value.dateForHuman();
-                                      });
-                                    }
-                                  });
-                                },
-                                validator: (String value) {
-                                  if (_bloc.selectedFactDate == null &&
-                                      _bloc.selectedFactTime != null) {
-                                    return 'Выберите';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: 30,
-                            ),
-//                            Text('время'),
+                                            border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(8)))),
+                                        readOnly: true,
+                                        controller: dateFieldController,
+                                        onTap: () {
+                                          showDatePicker(
+                                                  context: context,
+//                                                  locale: Locale('ru'),
+                                                  initialDate:
+                                                      _bloc.selectedFactDate ??
+                                                          DateTime.now(),
+                                                  firstDate: DateTime.now()
+                                                      .subtract(
+                                                          Duration(days: 30)),
+                                                  lastDate: DateTime.now())
+                                              .then((DateTime value) {
+                                            if (value != null) {
+                                              setState(() {
+                                                _bloc.selectedFactDate = value;
+                                                dateFieldController.text =
+                                                    value.dateForHuman();
+                                              });
+                                            }
+                                          });
+                                        },
+                                        validator: (String value) {
+                                          if (_bloc.selectedFactDate == null &&
+                                              _bloc.selectedFactTime != null) {
+                                            return 'Выберите';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      if (_bloc.selectedFactDate != null)
+                                        IconButton(
+                                          icon: Icon(Icons.cancel,
+                                              color: Colors.black38),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 12, horizontal: 8),
+                                          constraints: BoxConstraints(
+                                              minHeight: 0, minWidth: 0),
+                                          onPressed: _onClearFactDate,
+                                        )
+                                      else
+                                        SizedBox.shrink(),
+                                    ])),
 //                            SizedBox(
-//                              width: 8,
+//                              width: 30,
 //                            ),
                             Container(
-                              width: 100,
-                              child: TextFormField(
-                                autovalidate: true,
-                                decoration: InputDecoration(
-                                    labelText: _bloc.selectedFactTime == null
-                                        ? 'Время'
-                                        : null,
-                                    helperText: '',
-                                    suffixIcon: _bloc.selectedFactTime != null
-                                        ? IconButton(
-                                            icon: Icon(Icons.clear),
-                                            onPressed: _onClearFactTime,
-                                          )
-                                        : null,
-                                    contentPadding: EdgeInsets.only(left: 8),
+                                width: 90,
+                                child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      TextFormField(
+                                        autovalidate: true,
+                                        decoration: InputDecoration(
+                                            hintText: 'Время',
+                                            helperText: '',
+                                            contentPadding:
+                                                EdgeInsets.only(left: 8),
 //                                    filled: _bloc.selectedFactTime == null,
 //                                    fillColor: _fillColor,
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8)))),
-                                readOnly: true,
-                                controller: timeFieldController,
-                                onTap: () {
-                                  showTimePicker(
-                                          context: context,
-                                          initialTime: TimeOfDay.now())
-                                      .then((TimeOfDay value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        _bloc.selectedFactTime = value;
-                                        timeFieldController.text =
-                                            '${value.hour < 10 ? '0' : ''}${value.hour}:${value.minute < 10 ? '0' : ''}${value.minute}';
-                                      });
-                                    }
-                                  });
-                                },
-                                validator: (String value) {
-                                  if (_bloc.selectedFactTime == null &&
-                                      _bloc.selectedFactDate != null) {
-                                    return 'Выберите';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            )
+                                            border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(8)))),
+                                        readOnly: true,
+                                        controller: timeFieldController,
+                                        onTap: () {
+                                          showTimePicker(
+                                                  context: context,
+                                                  initialTime: TimeOfDay.now())
+                                              .then((TimeOfDay value) {
+                                            if (value != null) {
+                                              setState(() {
+                                                _bloc.selectedFactTime = value;
+                                                timeFieldController.text =
+                                                    '${value.hour < 10 ? '0' : ''}${value.hour}:${value.minute < 10 ? '0' : ''}${value.minute}';
+                                              });
+                                            }
+                                          });
+                                        },
+                                        validator: (String value) {
+                                          if (_bloc.selectedFactTime == null &&
+                                              _bloc.selectedFactDate != null) {
+                                            return 'Выберите';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      if (_bloc.selectedFactTime != null)
+                                        IconButton(
+                                          icon: Icon(Icons.cancel,
+                                              color: Colors.black38),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 12, horizontal: 8),
+                                          constraints: BoxConstraints(
+                                              minHeight: 0, minWidth: 0),
+                                          onPressed: _onClearFactTime,
+                                        )
+                                      else
+                                        SizedBox.shrink(),
+                                    ]))
                           ],
                         ),
                       ),
@@ -525,6 +537,5 @@ class _StatusScreenState extends State<StatusScreen> {
       dateFieldController.clear();
       FocusScope.of(context).unfocus();
     });
-
   }
 }

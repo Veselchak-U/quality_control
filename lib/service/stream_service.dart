@@ -91,7 +91,7 @@ class StreamService {
 
   List<EventItem> _filterCurrentEventItems(List<Request> requests) {
     List<EventItem> result = [];
-    var currentRequestId = _appState.requestItem.id;
+    var currentRequestId = _appState.requestItem?.id;
     if (currentRequestId != null) {
       var index = requests.indexWhere((Request r) => r.id == currentRequestId);
       if (index != -1) {
