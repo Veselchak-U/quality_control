@@ -279,6 +279,7 @@ class _StatusScreenState extends State<StatusScreen> {
                                             border: OutlineInputBorder(
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(8)))),
+                                        textAlignVertical: TextAlignVertical(y: 0.04),
                                         readOnly: true,
                                         controller: dateFieldController,
                                         onTap: () {
@@ -343,6 +344,7 @@ class _StatusScreenState extends State<StatusScreen> {
                                             border: OutlineInputBorder(
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(8)))),
+                                        textAlignVertical: TextAlignVertical(y: 0.04),
                                         readOnly: true,
                                         controller: timeFieldController,
                                         onTap: () {

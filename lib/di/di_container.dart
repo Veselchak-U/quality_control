@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/history_bloc.dart';
+import 'package:quality_control/bloc/history_chain_bloc.dart';
 import 'package:quality_control/bloc/info_bloc.dart';
 import 'package:quality_control/bloc/login_bloc.dart';
 import 'package:quality_control/bloc/quality_bloc.dart';
@@ -15,6 +16,7 @@ import 'package:quality_control/di/screen_builder.dart';
 import 'package:quality_control/entity/app_state.dart';
 import 'package:quality_control/service/current_user_service.dart';
 import 'package:quality_control/service/stream_service.dart';
+import 'package:quality_control/ui/history_chain_screen.dart';
 import 'package:quality_control/ui/history_screen.dart';
 import 'package:quality_control/ui/info_screen.dart';
 import 'package:quality_control/ui/login_screen.dart';
@@ -104,6 +106,17 @@ class DiContainer {
         (i) => () => BlocProvider<HistoryBloc>(
               child: HistoryScreen(),
               bloc: HistoryBloc(
+                  repository: i.get<Repository>(),
+                  screenBuilder: i.get<ScreenBuilder>(),
+                  streamService: i.get<StreamService>()),
+            ),
+        isSingleton: true);
+
+    // History chain screen
+    _injector.map<HistoryChainScreenBuilder>(
+        (i) => () => BlocProvider<HistoryChainBloc>(
+              child: HistoryChainScreen(),
+              bloc: HistoryChainBloc(
                   repository: i.get<Repository>(),
                   screenBuilder: i.get<ScreenBuilder>(),
                   streamService: i.get<StreamService>()),

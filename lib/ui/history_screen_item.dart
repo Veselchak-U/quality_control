@@ -40,7 +40,8 @@ class HistoryScreenItem extends StatelessWidget {
       child: FractionallySizedBox(
         widthFactor: 0.9,
         child: GestureDetector(
-          onTap: _showBottomSheet,
+          onTap:
+              /*bloc.isChainShow && item.isHaveHistory ? null :*/ _showBottomSheet,
           child: Container(
             decoration: BoxDecoration(
                 color: item.isAlien ? Colors.yellow[50] : Colors.green[50],
@@ -186,7 +187,8 @@ class HistoryScreenItem extends StatelessWidget {
       }
       String action;
       if (bloc.isChainShow) {
-        action = event.rootId == null ? 'выставил оценку' : 'внёс изменения: оценка';
+        action =
+            event.rootId == null ? 'выставил оценку' : 'внёс изменения: оценка';
       } else {
         action = 'выставил оценку';
       }
@@ -197,12 +199,20 @@ class HistoryScreenItem extends StatelessWidget {
 
   void _showBottomSheet() {
     Widget editListTile;
-    if (item.isAlien || item.isReadOnly) {
+    if (item.isAlien ||
+        item.isReadOnly ||
+        (bloc.isChainShow && item.isHaveHistory)) {
+      String textRefusal;
+      if (item.isAlien) {
+        textRefusal = 'Недоступно: чужая заявка';
+      } else if (item.isReadOnly) {
+        textRefusal = 'Недоступно: запрет изменения оценки';
+      } else if (bloc.isChainShow && item.isHaveHistory) {
+        textRefusal = 'Недоступно: не последнее событие';
+      }
       editListTile = ListTile(
         leading: Icon(Icons.edit, color: Colors.black38),
-        title: Text(
-            'Недоступно (${item.isAlien ? "чужая заявка" : "запрет корректировки оценки"})',
-            style: TextStyle(color: Colors.black38)),
+        title: Text(textRefusal, style: TextStyle(color: Colors.black38)),
       );
     } else {
       editListTile = ListTile(
@@ -228,7 +238,7 @@ class HistoryScreenItem extends StatelessWidget {
           child: Wrap(
             children: [
               editListTile,
-              if (item.isHaveHistory)
+              if (item.isHaveHistory && !bloc.isChainShow)
                 ListTile(
                   leading: Icon(Icons.linear_scale),
                   title: Text('Цепочка изменений'),
@@ -238,6 +248,11 @@ class HistoryScreenItem extends StatelessWidget {
                 )
               else
                 SizedBox.shrink(),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: Colors.black12,
+              ),
               ListTile(
                 leading: Icon(Icons.close),
                 title: Text('Отмена'),

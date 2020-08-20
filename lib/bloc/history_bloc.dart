@@ -68,14 +68,29 @@ class HistoryBloc extends IBloc {
   }
 
   void onTapShowChainBottomMenu({Event event}) {
-    if (isChainShow) {
-      _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
-    } else {
-      _repository.setAppState(
-          newAppState: AppState(eventFilterByChain: event.rootId ?? event.id));
-    }
-    isChainShow = !isChainShow;
-    Navigator.pop(context);
+    onTapExitBottomMenu();
+
+    _repository.setAppState(
+        newAppState: AppState(eventFilterByChain: event.rootId ?? event.id));
+
+    Widget Function() nextScreen;
+    nextScreen = _screenBuilder.getHistoryChainScreenBuilder();
+
+    Navigator.push(
+        context,
+        PageRouteBuilder<Widget>(
+            pageBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation) =>
+                nextScreen()));
+
+//    if (isChainShow) {
+//      _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
+//    } else {
+//      _repository.setAppState(
+//          newAppState: AppState(eventFilterByChain: event.rootId ?? event.id));
+//    }
+//    isChainShow = !isChainShow;
+//    Navigator.pop(context);
   }
 
   void onTapExitBottomMenu() {
@@ -108,7 +123,11 @@ class HistoryBloc extends IBloc {
 
   @override
   void dispose() {
-    _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
+//    if (isChainShow) {
+//      _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
+//  }
+
+//    _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
     _log.i('dispose');
   }
 }

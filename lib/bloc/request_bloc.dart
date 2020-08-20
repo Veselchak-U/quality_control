@@ -17,15 +17,7 @@ class RequestBloc extends IBloc {
       : _streamService = streamService,
         _repository = repository,
         _screenBuilder = screenBuilder {
-    outRequestsItems = streamService.requestItemsStream.stream;
-//    outRequestsItems.listen(_debugListenRequestsItems);
-    outRequestIntervalItems = streamService.requestIntervalItemsStream.stream;
-    currentListPresentation = ListPresentation.INTERVAL;
-    currentFilterByDate = streamService.requestFilterByDate;
-    currentFilterByText = streamService.requestFilterByText;
-    isSearchMode = currentFilterByText.isNotEmpty;
-    _appState = _repository.appState;
-//    streamService.appState.listen((AppState value) { _appState = value; });
+    initialize();
     _log.i('create');
   }
 
@@ -47,9 +39,17 @@ class RequestBloc extends IBloc {
   bool get isRequestPresentation =>
       currentListPresentation == ListPresentation.REQUEST;
 
-//  void _debugListenRequestsItems(List<Request> inRequests) {
-//    print('ku');
-//  }
+  void initialize() {
+    outRequestsItems = _streamService.requestItemsStream.stream;
+    outRequestIntervalItems = _streamService.requestIntervalItemsStream.stream;
+    currentListPresentation = ListPresentation.INTERVAL;
+    currentFilterByDate = _streamService.requestFilterByDate;
+    currentFilterByText = _streamService.requestFilterByText;
+    isSearchMode = currentFilterByText.isNotEmpty;
+//    _repository.setAppState(
+//        newAppState: AppState(requestItem: null, requestIntervalItem: null));
+    _appState = _repository.appState;
+  }
 
   void changeListPresentation() {
     if (currentListPresentation == ListPresentation.INTERVAL) {
@@ -96,8 +96,8 @@ class RequestBloc extends IBloc {
           .toRequestItem();
     }
     _repository.setAppState(
-        newAppState:
-            AppState(requestItem: requestItem, requestIntervalItem: intervalItem));
+        newAppState: AppState(
+            requestItem: requestItem, requestIntervalItem: intervalItem));
     _streamService.refreshDataEventsStream
         .add(RefreshDataEvent.REFRESH_REQUESTS);
 
