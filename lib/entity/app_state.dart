@@ -17,6 +17,7 @@ class AppState {
       this.event,
       this.listPresentation,
       this.bottomNavigationBarIndex,
+      this.historyItemIndex,
       this.statusReferences,
       this.ratingReferences,
       this.requests});
@@ -30,6 +31,7 @@ class AppState {
   Event event; // корректируемое событие из заявки
   ListPresentation listPresentation; // текущий режим показа списка
   int bottomNavigationBarIndex; // текущая вкладка внизу
+  int historyItemIndex; // индекс просмотренного элемента истории
   List<Status> statusReferences; // справочник статусов (для сохранения)
   List<Rating> ratingReferences; // справочник оценок (для сохранения)
   List<Request> requests; // текущие заявки (для сохранения)

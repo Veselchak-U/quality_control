@@ -3,6 +3,7 @@ import 'package:quality_control/bloc/common/bloc_provider.dart';
 import 'package:quality_control/bloc/history_bloc.dart';
 import 'package:quality_control/entity/event_item.dart';
 import 'package:quality_control/ui/history_screen_item.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class HistoryScreen extends StatefulWidget {
   @override
@@ -12,6 +13,9 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   HistoryBloc _bloc;
+  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
 
   @override
   void initState() {
@@ -19,6 +23,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _bloc = BlocProvider.of(context);
     _bloc.context = context;
     _bloc.scaffoldKey = _scaffoldKey;
+    // saver scroll position
+    _itemPositionsListener.itemPositions.addListener(() {
+      _bloc.itemIndex = _itemPositionsListener.itemPositions.value.first.index;
+      print('itemIndex = ${_bloc.itemIndex}');
+    });
   }
 
   @override
@@ -69,11 +78,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ));
           } else {
             return Scrollbar(
-              child: ListView.builder(
+              child: ScrollablePositionedList.builder(
                 padding: EdgeInsets.all(0),
                 itemCount: snapshot.data.length,
+                itemScrollController: _itemScrollController,
+                itemPositionsListener: _itemPositionsListener,
+                initialScrollIndex: _bloc.itemIndex ?? 0,
                 itemBuilder: (BuildContext context, int index) =>
-                    HistoryScreenItem(snapshot.data[index], _bloc),
+                    HistoryScreenItem(snapshot.data[index], _bloc, index),
               ),
             );
           }

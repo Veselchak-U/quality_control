@@ -95,9 +95,10 @@ class RequestBloc extends IBloc {
           .getRequestById(requestId: intervalItem.requestId)
           .toRequestItem();
     }
+    // TODO(dyv) restore historyItemIndex from unread messages
     _repository.setAppState(
         newAppState: AppState(
-            requestItem: requestItem, requestIntervalItem: intervalItem));
+            requestItem: requestItem, requestIntervalItem: intervalItem, historyItemIndex: 0));
     _streamService.refreshDataEventsStream
         .add(RefreshDataEvent.REFRESH_REQUESTS);
 

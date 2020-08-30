@@ -8,10 +8,11 @@ import 'package:quality_control/entity/work_interval.dart';
 import 'package:quality_control/extension/datetime_extension.dart';
 
 class HistoryScreenItem extends StatelessWidget {
-  HistoryScreenItem(this.item, this.bloc);
+  HistoryScreenItem(this.item, this.bloc, this.itemIndex);
 
   final EventItem item;
   final HistoryBloc bloc;
+  final int itemIndex;
   final TextStyle headerTextStyle =
       TextStyle(fontWeight: FontWeight.bold, fontSize: 14);
 

@@ -49,7 +49,7 @@ class _HistoryChainScreenState extends State<HistoryChainScreen> {
                 padding: EdgeInsets.all(0),
                 itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext context, int index) =>
-                    HistoryScreenItem(snapshot.data[index], _bloc),
+                    HistoryScreenItem(snapshot.data[index], _bloc, index),
               ),
             );
           }

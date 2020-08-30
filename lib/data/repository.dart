@@ -96,6 +96,9 @@ class Repository {
     if (newAppState.bottomNavigationBarIndex != null) {
       _appState.bottomNavigationBarIndex = newAppState.bottomNavigationBarIndex;
     }
+    if (newAppState.historyItemIndex != null) {
+      _appState.historyItemIndex = newAppState.historyItemIndex;
+    }
 
     // refresh data
     _streamService.appStateStream.add(_appState);

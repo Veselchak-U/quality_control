@@ -33,6 +33,7 @@ class HistoryBloc extends IBloc {
   RequestIntervalItem requestIntervalItem; // интервал, выбранный элемент списка
   AppState _appState;
   bool isChainShow;
+  int itemIndex;
 
   final int bottomNavigationBarIndex = 1;
   BuildContext context;
@@ -47,10 +48,11 @@ class HistoryBloc extends IBloc {
     ratingReferences = _repository.ratingReferences;
     var rootId = _appState.eventFilterByChain;
     isChainShow = rootId != null && rootId.isNotEmpty;
+    itemIndex = _appState.historyItemIndex;
   }
 
   void onTapEditBottomMenu({Event event}) {
-    _repository.setAppState(newAppState: AppState(event: event));
+    _repository.setAppState(newAppState: AppState(event: event, historyItemIndex: itemIndex));
 
     Widget Function() nextScreen;
     if (event.eventType == EventType.SET_STATUS) {
@@ -71,7 +73,7 @@ class HistoryBloc extends IBloc {
     onTapExitBottomMenu();
 
     _repository.setAppState(
-        newAppState: AppState(eventFilterByChain: event.rootId ?? event.id));
+        newAppState: AppState(eventFilterByChain: event.rootId ?? event.id, historyItemIndex: itemIndex));
 
     Widget Function() nextScreen;
     nextScreen = _screenBuilder.getHistoryChainScreenBuilder();
@@ -110,7 +112,7 @@ class HistoryBloc extends IBloc {
         nextScreen = _screenBuilder.getQualityScreenBuilder();
       }
       _repository.setAppState(
-          newAppState: AppState(bottomNavigationBarIndex: index));
+          newAppState: AppState(bottomNavigationBarIndex: index, historyItemIndex: itemIndex));
 
       Navigator.pushReplacement(
           context,
