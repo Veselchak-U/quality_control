@@ -25,8 +25,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _bloc.scaffoldKey = _scaffoldKey;
     // saver scroll position
     _itemPositionsListener.itemPositions.addListener(() {
-      _bloc.itemIndex = _itemPositionsListener.itemPositions.value.first.index;
-      print('itemIndex = ${_bloc.itemIndex}');
+      Iterable<ItemPosition> positions =
+          _itemPositionsListener.itemPositions.value;
+      if (positions.isNotEmpty) {
+        // min full-visible item
+        _bloc.itemIndex = positions
+            .where((ItemPosition position) => position.itemLeadingEdge >= 0)
+            .reduce((ItemPosition min, ItemPosition position) =>
+                position.itemTrailingEdge < min.itemTrailingEdge
+                    ? position
+                    : min)
+            .index;
+        // _bloc.itemIndex = positions.first.index;
+        print('itemIndex = ${_bloc.itemIndex}');
+      }
     });
   }
 
@@ -60,37 +72,38 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ],
     );
 
+    var body = StreamBuilder(
+      stream: _bloc.outEventItems,
+      builder: (BuildContext context, AsyncSnapshot<List<EventItem>> snapshot) {
+        if (snapshot.data == null || snapshot.data.isEmpty) {
+          return Center(
+              child: Text(
+            'Событий нет',
+            style: TextStyle(fontSize: 20, color: Colors.black38),
+          ));
+        } else {
+          return Scrollbar(
+            child: ScrollablePositionedList.builder(
+              padding: EdgeInsets.all(0),
+              itemCount: snapshot.data.length,
+              itemScrollController: _itemScrollController,
+              itemPositionsListener: _itemPositionsListener,
+              initialScrollIndex: _bloc.itemIndex,
+              itemBuilder: (BuildContext context, int index) =>
+                  HistoryScreenItem(snapshot.data[index], _bloc, index),
+            ),
+          );
+        }
+      },
+    );
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
         title: Text('Заявка № ${_bloc.requestItem.number}'),
       ),
-      body: StreamBuilder(
-        stream: _bloc.outEventItems,
-        builder:
-            (BuildContext context, AsyncSnapshot<List<EventItem>> snapshot) {
-          if (snapshot.data == null || snapshot.data.isEmpty) {
-            return Center(
-                child: Text(
-              'Событий нет',
-              style: TextStyle(fontSize: 20, color: Colors.black38),
-            ));
-          } else {
-            return Scrollbar(
-              child: ScrollablePositionedList.builder(
-                padding: EdgeInsets.all(0),
-                itemCount: snapshot.data.length,
-                itemScrollController: _itemScrollController,
-                itemPositionsListener: _itemPositionsListener,
-                initialScrollIndex: _bloc.itemIndex ?? 0,
-                itemBuilder: (BuildContext context, int index) =>
-                    HistoryScreenItem(snapshot.data[index], _bloc, index),
-              ),
-            );
-          }
-        },
-      ),
+      body: body,
       bottomNavigationBar: bottomNavigationBar,
     );
   }

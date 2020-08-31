@@ -48,7 +48,8 @@ class HistoryBloc extends IBloc {
     ratingReferences = _repository.ratingReferences;
     var rootId = _appState.eventFilterByChain;
     isChainShow = rootId != null && rootId.isNotEmpty;
-    itemIndex = _appState.historyItemIndex;
+    itemIndex = _appState.historyItemIndex ?? 0;
+    print('restored itemIndex = $itemIndex');
   }
 
   void onTapEditBottomMenu({Event event}) {
@@ -113,6 +114,7 @@ class HistoryBloc extends IBloc {
       }
       _repository.setAppState(
           newAppState: AppState(bottomNavigationBarIndex: index, historyItemIndex: itemIndex));
+      print('saved itemIndex = $itemIndex');
 
       Navigator.pushReplacement(
           context,
