@@ -53,7 +53,9 @@ class HistoryBloc extends IBloc {
   }
 
   void onTapEditBottomMenu({Event event}) {
-    _repository.setAppState(newAppState: AppState(event: event, historyItemIndex: itemIndex));
+    _repository.setAppState(
+        newAppState: AppState(event: event, historyItemIndex: itemIndex));
+    print('saved itemIndex = $itemIndex');
 
     Widget Function() nextScreen;
     if (event.eventType == EventType.SET_STATUS) {
@@ -71,32 +73,23 @@ class HistoryBloc extends IBloc {
   }
 
   void onTapShowChainBottomMenu({Event event}) {
-    onTapExitBottomMenu();
+    closeBottomMenu();
 
-    _repository.setAppState(
-        newAppState: AppState(eventFilterByChain: event.rootId ?? event.id, historyItemIndex: itemIndex));
+    _repository.setAppState(newAppState: AppState(historyItemIndex: itemIndex));
+    print('saved itemIndex = $itemIndex');
 
-    Widget Function() nextScreen;
-    nextScreen = _screenBuilder.getHistoryChainScreenBuilder();
+    Widget Function(Event event) nextScreen;
+    nextScreen = _screenBuilder.getHistoryChainScreenBuilder(event);
 
     Navigator.push(
         context,
         PageRouteBuilder<Widget>(
             pageBuilder: (BuildContext context, Animation<double> animation,
                     Animation<double> secondaryAnimation) =>
-                nextScreen()));
-
-//    if (isChainShow) {
-//      _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
-//    } else {
-//      _repository.setAppState(
-//          newAppState: AppState(eventFilterByChain: event.rootId ?? event.id));
-//    }
-//    isChainShow = !isChainShow;
-//    Navigator.pop(context);
+                nextScreen(event)));
   }
 
-  void onTapExitBottomMenu() {
+  void closeBottomMenu() {
     Navigator.pop(context);
   }
 
@@ -113,7 +106,8 @@ class HistoryBloc extends IBloc {
         nextScreen = _screenBuilder.getQualityScreenBuilder();
       }
       _repository.setAppState(
-          newAppState: AppState(bottomNavigationBarIndex: index, historyItemIndex: itemIndex));
+          newAppState: AppState(
+              bottomNavigationBarIndex: index, historyItemIndex: itemIndex));
       print('saved itemIndex = $itemIndex');
 
       Navigator.pushReplacement(

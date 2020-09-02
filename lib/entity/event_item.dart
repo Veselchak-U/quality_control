@@ -5,6 +5,7 @@ class EventItem {
   EventItem(
       {@required this.type,
       this.event,
+      this.rootDate,
       this.isAlien,
       this.isReadOnly,
       this.isHaveHistory,
@@ -12,6 +13,7 @@ class EventItem {
 
   EventItemType type;
   Event event;
+  DateTime rootDate; // системное время первого события в цепочке
   bool isAlien; // чужое событие
   bool isReadOnly; // согласно настроек справочника оценок
   bool isHaveHistory; // имеет историю изменений

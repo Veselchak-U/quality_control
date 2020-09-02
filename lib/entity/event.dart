@@ -22,7 +22,7 @@ class Event {
 
   String id;
   String rootId; // id первого события в цепочке
-  String childId; // id корректирующего события
+  String childId; // id события, корректирующего текущее
   DateTime systemDate; // время системное
   DateTime userDate; // время указанное пользователем
   User user; // пользователь, создавший событие

@@ -16,9 +16,6 @@ class StreamService {
     _log.i('create');
   }
 
-  // Текущее состояние приложения
-  final BehaviorSubject<AppState> appStateStream = BehaviorSubject<AppState>();
-
   // Заявки - входящий поток
   final BehaviorSubject<List<Request>> requestsStream =
       BehaviorSubject<List<Request>>();
@@ -35,13 +32,19 @@ class StreamService {
   final BehaviorSubject<List<EventItem>> eventItemsStream =
       BehaviorSubject<List<EventItem>>();
 
+  // Элементы списка: цепочка событий корректировки
+  final PublishSubject<List<EventItem>> chainItemsStream =
+      PublishSubject<List<EventItem>>();
+
   // События о необходимости обновления данных
   final PublishSubject<RefreshDataEvent> refreshDataEventsStream =
       PublishSubject<RefreshDataEvent>();
 
-  AppState _appState;
+  // Поток с текущим состоянием приложения
+  final BehaviorSubject<AppState> appStateStream = BehaviorSubject<AppState>();
 
-  final FimberLog _log = FimberLog('StreamService');
+  // Текущее состояние приложения (для локального применения)
+  AppState _appState;
 
   // фильтр заявок по-умолчанию (дата)
   FilterByDate _requestFilterByDate;
@@ -63,6 +66,8 @@ class StreamService {
     refreshDataEventsStream.add(RefreshDataEvent.REFRESH_REQUESTS);
   }
 
+  final FimberLog _log = FimberLog('StreamService');
+
   bool initialize() {
     _log.d('initialize() start');
 
@@ -74,12 +79,19 @@ class StreamService {
         .map(_filterRequestItems)
         .map(_sortRequestItems)
         .listen(requestItemsStream.add);
+
     requestsStream
         .map(_convertRequestsToRequestIntervalItems)
         .map(_filterRequestIntervalItems)
         .map(_sortRequestIntervalItems)
         .listen(requestIntervalItemsStream.add);
-    requestsStream.map(_filterCurrentEventItems).listen(eventItemsStream.add);
+
+    requestsStream.map(_filterEventItems).listen(eventItemsStream.add);
+
+    requestsStream
+        .map(_filterChainEvents)
+        .map(_convertToEventItems)
+        .listen(chainItemsStream.add);
 
     appStateStream.listen((AppState value) {
       _appState = value;
@@ -89,7 +101,80 @@ class StreamService {
     return true;
   }
 
-  List<EventItem> _filterCurrentEventItems(List<Request> requests) {
+  List<Event> _filterChainEvents(List<Request> requests) {
+    List<Event> result = [];
+    // get chain filter
+    var rootId = _appState.eventFilterByChain;
+    if (rootId != null && rootId.isNotEmpty) {
+      // get current request events
+      var currentRequestId = _appState.requestItem?.id;
+      if (currentRequestId != null) {
+        var index =
+            requests.indexWhere((Request r) => r.id == currentRequestId);
+        if (index != -1) {
+          List<Event> events = requests[index].events;
+          if (events != null && events.isNotEmpty) {
+            // get events by chain filter
+            events.forEach((Event e) {
+              if (rootId == e.rootId || rootId == e.id) {
+                result.add(e);
+              }
+            });
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  List<EventItem> _convertToEventItems(List<Event> filterEvents) {
+    List<EventItem> result = [];
+    var rootId = _appState.eventFilterByChain;
+    var isChainShow = rootId != null && rootId.isNotEmpty;
+
+    if (filterEvents != null && filterEvents.isNotEmpty) {
+      // DATE_LABEL
+      var currentDate = filterEvents[0].systemDate.trunc();
+      result.add(_getDateLabelEvent(date: currentDate));
+
+      filterEvents.forEach((Event e) {
+        // DATE_LABEL
+        var nextDate = e.systemDate.trunc();
+        if (nextDate != currentDate) {
+          currentDate = nextDate;
+          result.add(_getDateLabelEvent(date: currentDate));
+        }
+        // EVENT
+        EventItem eventItem;
+        if (isChainShow) {
+          // просмотр цепочки изменений
+          eventItem = EventItem(
+              type: EventItemType.EVENT,
+              event: e,
+              isAlien: _isAlienEvent(event: e),
+              isReadOnly: _isReadOnlyEvent(event: e),
+              isHaveHistory: e.childId != null);
+          result.add(eventItem);
+        } else {
+          // обычный просмотр событий
+          if (e.childId == null) {
+            // показываем только последнюю корр-ку, но с датой первого события
+            eventItem = EventItem(
+                type: EventItemType.EVENT,
+                event: e,
+                rootDate: _getRootDate(events: filterEvents, rootId: e.rootId),
+                isAlien: _isAlienEvent(event: e),
+                isReadOnly: _isReadOnlyEvent(event: e),
+                isHaveHistory: e.rootId != null /* || e.childId != null*/);
+            result.add(eventItem);
+          }
+        }
+      });
+    }
+    return result;
+  }
+
+  List<EventItem> _filterEventItems(List<Request> requests) {
     List<EventItem> result = [];
     var currentRequestId = _appState.requestItem?.id;
     if (currentRequestId != null) {
@@ -172,6 +257,14 @@ class StreamService {
           result = true;
         }
       }
+    }
+    return result;
+  }
+
+  DateTime _getRootDate({List<Event> events, String rootId}) {
+    DateTime result;
+    if (events.isNotEmpty && rootId != null) {
+      result = events.firstWhere((Event e) => e.id == rootId).systemDate;
     }
     return result;
   }
@@ -350,6 +443,7 @@ class StreamService {
     refreshDataEventsStream.close();
     _log.i('dispose');
   }
+
 }
 
 enum FilterByDate { BEFORE, TODAY, AFTER }

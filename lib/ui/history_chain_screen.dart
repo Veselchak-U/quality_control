@@ -34,7 +34,7 @@ class _HistoryChainScreenState extends State<HistoryChainScreen> {
         title: Text('Цепочка изменений'),
       ),
       body: StreamBuilder(
-        stream: _bloc.outEventItems,
+        stream: _myBloc.outChainItems,
         builder:
             (BuildContext context, AsyncSnapshot<List<EventItem>> snapshot) {
           if (snapshot.data == null || snapshot.data.isEmpty) {

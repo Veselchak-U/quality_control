@@ -19,6 +19,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   void initState() {
+    print('HistoryScreen initState()');
     super.initState();
     _bloc = BlocProvider.of(context);
     _bloc.context = context;
@@ -27,7 +28,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _itemPositionsListener.itemPositions.addListener(() {
       Iterable<ItemPosition> positions =
           _itemPositionsListener.itemPositions.value;
-      if (positions.isNotEmpty) {
+      if (positions.isNotEmpty && !_bloc.isChainShow) {
         // min full-visible item
         _bloc.itemIndex = positions
             .where((ItemPosition position) => position.itemLeadingEdge >= 0)
@@ -37,7 +38,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     : min)
             .index;
         // _bloc.itemIndex = positions.first.index;
-        print('itemIndex = ${_bloc.itemIndex}');
+        print('new itemIndex = ${_bloc.itemIndex}');
       }
     });
   }
@@ -88,7 +89,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               itemCount: snapshot.data.length,
               itemScrollController: _itemScrollController,
               itemPositionsListener: _itemPositionsListener,
-              initialScrollIndex: _bloc.itemIndex,
+              initialScrollIndex: _bloc.isChainShow ? 0 : _bloc.itemIndex,
               itemBuilder: (BuildContext context, int index) =>
                   HistoryScreenItem(snapshot.data[index], _bloc, index),
             ),

@@ -14,6 +14,7 @@ import 'package:quality_control/data/dummy_data_source.dart';
 import 'package:quality_control/data/repository.dart';
 import 'package:quality_control/di/screen_builder.dart';
 import 'package:quality_control/entity/app_state.dart';
+import 'package:quality_control/entity/event.dart';
 import 'package:quality_control/service/current_user_service.dart';
 import 'package:quality_control/service/stream_service.dart';
 import 'package:quality_control/ui/history_chain_screen.dart';
@@ -114,9 +115,10 @@ class DiContainer {
 
     // History chain screen
     _injector.map<HistoryChainScreenBuilder>(
-        (i) => () => BlocProvider<HistoryChainBloc>(
+        (i) => (Event event) => BlocProvider<HistoryChainBloc>(
               child: HistoryChainScreen(),
               bloc: HistoryChainBloc(
+                  event: event,
                   repository: i.get<Repository>(),
                   screenBuilder: i.get<ScreenBuilder>(),
                   streamService: i.get<StreamService>()),

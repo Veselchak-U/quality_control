@@ -257,7 +257,7 @@ class HistoryScreenItem extends StatelessWidget {
               ListTile(
                 leading: Icon(Icons.close),
                 title: Text('Отмена'),
-                onTap: bloc.onTapExitBottomMenu,
+                onTap: bloc.closeBottomMenu,
               ),
             ],
           ),
