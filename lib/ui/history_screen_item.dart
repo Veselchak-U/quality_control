@@ -35,6 +35,8 @@ class HistoryScreenItem extends StatelessWidget {
   }
 
   Widget _getEventItem() {
+    var eventDate = item.rootDate ?? item.event.systemDate;
+
     return Container(
       alignment: item.isAlien ? Alignment.centerLeft : Alignment.centerRight,
       padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -83,7 +85,7 @@ class HistoryScreenItem extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Text(item.event.systemDate.formatDate('HH:mm'),
+                      Text(eventDate.formatDate('HH:mm'),
 //                            overflow: TextOverflow.ellipsis,
                           style: headerTextStyle),
                     ],

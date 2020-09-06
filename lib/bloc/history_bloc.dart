@@ -49,13 +49,11 @@ class HistoryBloc extends IBloc {
     var rootId = _appState.eventFilterByChain;
     isChainShow = rootId != null && rootId.isNotEmpty;
     itemIndex = _appState.historyItemIndex ?? 0;
-    print('restored itemIndex = $itemIndex');
   }
 
   void onTapEditBottomMenu({Event event}) {
     _repository.setAppState(
         newAppState: AppState(event: event, historyItemIndex: itemIndex));
-    print('saved itemIndex = $itemIndex');
 
     Widget Function() nextScreen;
     if (event.eventType == EventType.SET_STATUS) {
@@ -74,9 +72,7 @@ class HistoryBloc extends IBloc {
 
   void onTapShowChainBottomMenu({Event event}) {
     closeBottomMenu();
-
     _repository.setAppState(newAppState: AppState(historyItemIndex: itemIndex));
-    print('saved itemIndex = $itemIndex');
 
     Widget Function(Event event) nextScreen;
     nextScreen = _screenBuilder.getHistoryChainScreenBuilder(event);
@@ -108,7 +104,6 @@ class HistoryBloc extends IBloc {
       _repository.setAppState(
           newAppState: AppState(
               bottomNavigationBarIndex: index, historyItemIndex: itemIndex));
-      print('saved itemIndex = $itemIndex');
 
       Navigator.pushReplacement(
           context,
@@ -121,11 +116,6 @@ class HistoryBloc extends IBloc {
 
   @override
   void dispose() {
-//    if (isChainShow) {
-//      _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
-//  }
-
-//    _repository.setAppState(newAppState: AppState(eventFilterByChain: ''));
     _log.i('dispose');
   }
 }

@@ -86,10 +86,14 @@ class StreamService {
         .map(_sortRequestIntervalItems)
         .listen(requestIntervalItemsStream.add);
 
-    requestsStream.map(_filterEventItems).listen(eventItemsStream.add);
+    // requestsStream.map(_filterEventItems).listen(eventItemsStream.add);
+    requestsStream
+        .map(_getCurrentRequestEvents)
+        .map(_convertToEventItems)
+        .listen(eventItemsStream.add);
 
     requestsStream
-        .map(_filterChainEvents)
+        .map(_getChainEvents)
         .map(_convertToEventItems)
         .listen(chainItemsStream.add);
 
@@ -101,26 +105,34 @@ class StreamService {
     return true;
   }
 
-  List<Event> _filterChainEvents(List<Request> requests) {
+  List<Event> _getChainEvents(List<Request> requests) {
     List<Event> result = [];
     // get chain filter
     var rootId = _appState.eventFilterByChain;
     if (rootId != null && rootId.isNotEmpty) {
       // get current request events
-      var currentRequestId = _appState.requestItem?.id;
-      if (currentRequestId != null) {
-        var index =
-            requests.indexWhere((Request r) => r.id == currentRequestId);
-        if (index != -1) {
-          List<Event> events = requests[index].events;
-          if (events != null && events.isNotEmpty) {
-            // get events by chain filter
-            events.forEach((Event e) {
-              if (rootId == e.rootId || rootId == e.id) {
-                result.add(e);
-              }
-            });
+      List<Event> events = _getCurrentRequestEvents(requests);
+      if (events.isNotEmpty) {
+        // get events by chain filter
+        events.forEach((Event e) {
+          if (rootId == e.rootId || rootId == e.id) {
+            result.add(e);
           }
+        });
+      }
+    }
+    return result;
+  }
+
+  List<Event> _getCurrentRequestEvents(List<Request> requests) {
+    List<Event> result = [];
+    var currentRequestId = _appState.requestItem?.id;
+    if (currentRequestId != null) {
+      var index = requests.indexWhere((Request r) => r.id == currentRequestId);
+      if (index != -1) {
+        List<Event> events = requests[index].events;
+        if (events != null) {
+          result = events;
         }
       }
     }
@@ -151,6 +163,7 @@ class StreamService {
           eventItem = EventItem(
               type: EventItemType.EVENT,
               event: e,
+              rootDate: e.systemDate,
               isAlien: _isAlienEvent(event: e),
               isReadOnly: _isReadOnlyEvent(event: e),
               isHaveHistory: e.childId != null);
@@ -162,7 +175,9 @@ class StreamService {
             eventItem = EventItem(
                 type: EventItemType.EVENT,
                 event: e,
-                rootDate: _getRootDate(events: filterEvents, rootId: e.rootId),
+                rootDate:
+                    _getRootDate(events: filterEvents, rootId: e.rootId) ??
+                        e.systemDate,
                 isAlien: _isAlienEvent(event: e),
                 isReadOnly: _isReadOnlyEvent(event: e),
                 isHaveHistory: e.rootId != null /* || e.childId != null*/);
@@ -170,11 +185,15 @@ class StreamService {
           }
         }
       });
+      if (result.isNotEmpty) {
+        result.sort(
+            (EventItem a, EventItem b) => a.rootDate.compareTo(b.rootDate));
+      }
     }
     return result;
   }
 
-  List<EventItem> _filterEventItems(List<Request> requests) {
+/*  List<EventItem> _filterEventItems(List<Request> requests) {
     List<EventItem> result = [];
     var currentRequestId = _appState.requestItem?.id;
     if (currentRequestId != null) {
@@ -235,7 +254,7 @@ class StreamService {
       }
     }
     return result;
-  }
+  }*/
 
   bool _isAlienEvent({Event event}) {
     bool result = true;
@@ -271,7 +290,9 @@ class StreamService {
 
   EventItem _getDateLabelEvent({DateTime date}) {
     return EventItem(
-        type: EventItemType.DATE_LABEL, labelText: date.dateForHuman());
+        type: EventItemType.DATE_LABEL,
+        labelText: date.dateForHuman(),
+        rootDate: date);
   }
 
   List<RequestItem> _filterRequestItems(List<RequestItem> inRequestItems) {
@@ -443,7 +464,6 @@ class StreamService {
     refreshDataEventsStream.close();
     _log.i('dispose');
   }
-
 }
 
 enum FilterByDate { BEFORE, TODAY, AFTER }
